@@ -25,7 +25,7 @@ namespace TheV
                 .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Debug)
                 //All version handlers
                 .AddScoped<IOsVersionChecker, OsVersionChecker>()
-                .AddScoped<INpmVersionHandler, NpmVersionChecker>()
+                .AddScoped<INpmVersionChecker, NpmVersionChecker>()
                 .AddScoped<INetCoreRuntimeVersionChecker, NetCoreRuntimeVersionChecker>()
                 .AddScoped<INetCoreSdkVersionChecker, NetCoreSdkVersionChecker>()
                 .AddScoped<INetVersionChecker, NetVersionChecker>()
