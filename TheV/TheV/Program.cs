@@ -3,7 +3,8 @@
 using Microsoft.Extensions.DependencyInjection;
 //using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TheV.Handlers;
+using TheV.Checkers;
+using TheV.Checkers.Interfaces;
 using TheV.Managers;
 
 namespace TheV
@@ -23,20 +24,22 @@ namespace TheV
                 })
                 .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Debug)
                 //All version handlers
-                .AddScoped<IOsVersionHandler, OsVersionHandler>()
-                .AddScoped<INpmVersionHandler, NpmVersionHandler>()
-                .AddScoped<INetCoreVersionHandler, NetCoreVersionHandler>()
-                .AddScoped<INodeVersionHandler, NodeVersionHandler>()
+                .AddScoped<IOsVersionChecker, OsVersionChecker>()
+                .AddScoped<INpmVersionHandler, NpmVersionChecker>()
+                .AddScoped<INetCoreRuntimeVersionChecker, NetCoreRuntimeVersionChecker>()
+                .AddScoped<INetCoreSdkVersionChecker, NetCoreSdkVersionChecker>()
+                .AddScoped<INetVersionChecker, NetVersionChecker>()
+                .AddScoped<INodeVersionChecker, NodeVersionChecker>()
 
 
-
+                //Singleton
                 .AddScoped<IProcessManager, ProcessManager>()
 
                 .BuildServiceProvider();
 
 
             var logger = serviceProvider.GetService<ILogger<Program>>();
-            logger.LogDebug("All done!");
+            //logger.LogDebug("All done!");
 
             //do the actual work here
             //var bar = serviceProvider.GetService<IBarService>();
@@ -44,17 +47,23 @@ namespace TheV
 
             using (var scope = serviceProvider.CreateScope())
             {
-                var osHandler = scope.ServiceProvider.GetRequiredService<IOsVersionHandler>();
-                var osInfo = osHandler.GetOsInfo();
-                Console.WriteLine(osInfo.Print());
                 logger.LogDebug("In scope!");
 
+                var osVersionChecker = scope.ServiceProvider.GetRequiredService<IOsVersionChecker>();
+                Console.WriteLine(osVersionChecker.GetVersion());
 
-                var netCoreVersionHandler = scope.ServiceProvider.GetRequiredService<INetCoreVersionHandler>();
-                Console.WriteLine(netCoreVersionHandler.GetVersion());
+                var netVersionChecker = scope.ServiceProvider.GetRequiredService<INetVersionChecker>();
+                Console.WriteLine(netVersionChecker.GetVersion());
 
-                var nodeVersionHandler = scope.ServiceProvider.GetRequiredService<INodeVersionHandler>();
-                Console.WriteLine(nodeVersionHandler.GetVersion());
+
+                var netCoreSdkVersionChecker = scope.ServiceProvider.GetRequiredService<INetCoreSdkVersionChecker>();
+                Console.WriteLine(netCoreSdkVersionChecker.GetVersion());
+
+                var netCoreVersionChecker = scope.ServiceProvider.GetRequiredService<INetCoreRuntimeVersionChecker>();
+                Console.WriteLine(netCoreVersionChecker.GetVersion());
+
+                var nodeVersionChecker = scope.ServiceProvider.GetRequiredService<INodeVersionChecker>();
+                Console.WriteLine(nodeVersionChecker.GetVersion());
 
                 //var npmVersionHandler = scope.ServiceProvider.GetRequiredService<INpmVersionHandler>();
                 //Console.WriteLine(npmVersionHandler.GetVersion());
@@ -69,7 +78,7 @@ namespace TheV
 
             logger.LogDebug("All done!");
 
-            Console.WriteLine("Hello TheV!");
+            //Console.WriteLine("Hello TheV!");
         }
 
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TheV.Handlers;
+using TheV.Checkers;
 using TheV.Managers;
 
 namespace TheV.UnitTests.Handlers
@@ -10,7 +10,7 @@ namespace TheV.UnitTests.Handlers
         [TestMethod]
         public void GetNetCoreVersion()
         {
-            var handler = new NetCoreVersionHandler(new ProcessManager());
+            var handler = new NetCoreRuntimeVersionChecker(new ProcessManager());
             handler.GetVersion();
 
             // Assert.IsTrue(result.Caption.Contains("Windows"));

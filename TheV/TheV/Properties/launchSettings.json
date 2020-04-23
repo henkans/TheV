@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TheV": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    }
+  }
+}

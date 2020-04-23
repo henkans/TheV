@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TheV.Handlers;
+using TheV.Checkers;
 
 namespace TheV.UnitTests.Handlers { 
 
@@ -9,10 +9,10 @@ public class OsHandlerTests
     [TestMethod]
     public void GetOsInfo()
     {
-        var handler = new OsVersionHandler();
-        var result = handler.GetOsInfo();
+        var handler = new OsVersionChecker();
+        var result = handler.GetVersion();
 
-        Assert.IsTrue(result.Caption.Contains("Windows"));
+        Assert.IsTrue(result.Contains("Windows"));
 
     }
 

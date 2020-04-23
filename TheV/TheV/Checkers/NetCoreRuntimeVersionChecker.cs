@@ -1,26 +1,26 @@
-﻿using System;
-using System.Diagnostics;
+﻿using TheV.Checkers.Interfaces;
 using TheV.Managers;
 
-namespace TheV.Handlers
+namespace TheV.Checkers
 {
-
-    public interface INetCoreVersionHandler
-    {
-        string GetVersion();
-    }
-
-    public class NetCoreVersionHandler : INetCoreVersionHandler
+    public class NetCoreRuntimeVersionChecker : INetCoreRuntimeVersionChecker
     {
         private readonly IProcessManager _processManager;
 
-        public NetCoreVersionHandler(IProcessManager processManager)
+        public NetCoreRuntimeVersionChecker(IProcessManager processManager)
         {
             _processManager = processManager;
         }
-        public string GetVersion()
+        public string GetVersion(bool verbose = false)
         {
-            return _processManager.RunCommand("dotnet","--version");
+
+            return ".NET Core runtimes installed:\n" + _processManager.RunCommand("dotnet", "--list-runtimes");
+
+            //var resultCollection = new Collection<string>();
+
+            //resultCollection.Add(_processManager.RunCommand("dotnet", "--version"));
+
+            //return _processManager.RunCommand("dotnet", "--list-runtimes");
 
             // dotnet --list-sdks
             // dotnet --list-runtimes

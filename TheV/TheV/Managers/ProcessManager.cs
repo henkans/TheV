@@ -36,7 +36,7 @@ namespace TheV.Managers
         {
             var startInfo = new ProcessStartInfo()
             {
-                //TODO check if docker is installed
+               
                 FileName = "dotnet",
                 Arguments = arguments,
                 // WorkingDirectory = workingDirectory,
@@ -52,9 +52,9 @@ namespace TheV.Managers
                 StartInfo = startInfo,
                 EnableRaisingEvents = true,
             };
-            _process.OutputDataReceived += DockerOutputDataReceived;
-            _process.ErrorDataReceived += DockerErrorDataReceived;
-            _process.Exited += DockerExited;
+            _process.OutputDataReceived += ProcessOutputDataReceived;
+            _process.ErrorDataReceived += ProcessErrorDataReceived;
+            _process.Exited += ProcessExited;
         }
 
         // Run command asynchronously...kind of
@@ -95,19 +95,20 @@ namespace TheV.Managers
         }
 
         // Handler for OutputDataReceived event of process.
-        private void DockerOutputDataReceived(object sender, DataReceivedEventArgs e)
+        private void ProcessOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             OutputDataReceived(this, new DataEventArgs(e.Data));
         }
 
         // Handler for ErrorDataReceived event of process.
-        private void DockerErrorDataReceived(object sender, DataReceivedEventArgs e)
+        private void ProcessErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            ErrorDataReceived(this, new DataEventArgs(e.Data));
+            //ErrorDataReceived(this, new DataEventArgs(e.Data));
+            ErrorDataReceived(this, new DataEventArgs("Finns inte"));
         }
 
         // Handler for Exited event of process.
-        private void DockerExited(object sender, EventArgs e)
+        private void ProcessExited(object sender, EventArgs e)
         {
             HasExited = true;
             IsRunning = false;
