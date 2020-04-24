@@ -30,8 +30,9 @@ namespace TheV
                 .AddScoped<INetCoreSdkVersionChecker, NetCoreSdkVersionChecker>()
                 .AddScoped<INetVersionChecker, NetVersionChecker>()
                 .AddScoped<INodeVersionChecker, NodeVersionChecker>()
+                .AddScoped<IPsVersionChecker, PsVersionChecker>()
 
-
+                // PsVersionChecker
                 //Singleton
                 .AddScoped<IProcessManager, ProcessManager>()
 
@@ -48,6 +49,9 @@ namespace TheV
             using (var scope = serviceProvider.CreateScope())
             {
                 logger.LogDebug("In scope!");
+
+                var psVersionChecker = scope.ServiceProvider.GetRequiredService<IPsVersionChecker>();
+                Console.WriteLine(psVersionChecker.GetVersion());
 
                 var osVersionChecker = scope.ServiceProvider.GetRequiredService<IOsVersionChecker>();
                 Console.WriteLine(osVersionChecker.GetVersion());

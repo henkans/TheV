@@ -1,36 +1,24 @@
-﻿namespace TheV.Checkers
+﻿using System.Runtime.InteropServices;
+using TheV.Checkers.Interfaces;
+
+namespace TheV.Checkers
 {
-    class PsVersionChecker
+    public class PsVersionChecker : IPsVersionChecker
     {
-
-
-        // powershell.exe $PSVersionTable.Version
-
-        public bool PowershellExists()
+        private const string Tilte = "Powershell";
+        public string GetVersion(bool verbose = false)
         {
-            string regval = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1", "Install", null).ToString();
-            if (regval.Equals("1"))
-                return true;
-            else
-                return false;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                //Windows
+                string regval = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\3", "Install", null).ToString();
+                if (regval.Equals("1"))
+                {
+                    var regval2 = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine", "PowerShellVersion", null).ToString();
+                    return $"{Tilte}:\n{regval2}";
+                }
+            }
+            return string.Empty;
         }
-
-
-        /*
-         *
-         
-        PS51> (Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine -Name 'PowerShellVersion').PowerShellVersion
-5.1.17134.1
-         
-
-        PS51> [version](Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine -Name 'PowerShellVersion').PowerShellVersion
-
-Major  Minor  Build  Revision
------  -----  -----  --------
-5      1      17134  1
-         *
-         */
-
-
     }
 }
