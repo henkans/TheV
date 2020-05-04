@@ -5,13 +5,7 @@ using TheV.Models;
 namespace TheV.Managers
 {
 
-    public interface IProcessManager
-    {
-        string RunCommand(string fileName, string arguments);
-        void RunCommandAsync(string fileName, string arguments);
-        void WriteToStandardInput(string command);
-        void Kill();
-    }
+
 
     public class ProcessManager : IProcessManager
     {
@@ -129,6 +123,7 @@ namespace TheV.Managers
             {
                 //Run process
                 Process process = new Process();
+
                 process.StartInfo.FileName = fileName;
                 process.StartInfo.Arguments = arguments;
                 process.StartInfo.UseShellExecute = false;
@@ -140,7 +135,7 @@ namespace TheV.Managers
                 output = process.StandardOutput.ReadToEnd();
                 Debug.WriteLine(output);
                 string err = process.StandardError.ReadToEnd();
-                if (!string.IsNullOrEmpty(err)) throw new ArgumentException($"RunCommand Error - args: {arguments} ");
+                if (!string.IsNullOrEmpty(err)) throw new ArgumentException($"RunCommand Error {fileName} - args: {arguments} ");
 
                 process.WaitForExit();
             }

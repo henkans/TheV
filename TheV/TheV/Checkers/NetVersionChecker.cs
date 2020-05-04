@@ -6,8 +6,10 @@ using TheV.Checkers.Interfaces;
 
 namespace TheV.Checkers
 {
-    public class NetVersionChecker : INetVersionChecker
+    internal class NetVersionChecker : IVersionChecker
     {
+
+        public string Title => ".NET Framework";
 
         public string GetVersion(bool verbose = true)
         {
@@ -18,9 +20,9 @@ namespace TheV.Checkers
                 using var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey);
                 if (ndpKey != null && ndpKey.GetValue("Release") != null)
                 {
-                    return $".NET Framework Version:\n {CheckFor45PlusVersion((int) ndpKey.GetValue("Release"))}\n";
+                    return $"{CheckFor45PlusVersion((int) ndpKey.GetValue("Release"))}\n";
                 }
-                return ".NET Framework Version 4.5 or later is not detected.";
+                return ".NET Framework Version 4.5 or later is not detected.\n";
             }
 
             // If linux return empty

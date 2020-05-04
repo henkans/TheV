@@ -3,9 +3,10 @@ using TheV.Checkers.Interfaces;
 
 namespace TheV.Checkers
 {
-    public class PsVersionChecker : IPsVersionChecker
+    internal class PsVersionChecker : IVersionChecker
     {
-        private const string Tilte = "Powershell";
+        public string Title => "Powershell";
+
         public string GetVersion(bool verbose = false)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -15,7 +16,7 @@ namespace TheV.Checkers
                 if (regval.Equals("1"))
                 {
                     var regval2 = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine", "PowerShellVersion", null).ToString();
-                    return $"{Tilte}:\n{regval2}";
+                    return $"{regval2}\n";
                 }
             }
             return string.Empty;

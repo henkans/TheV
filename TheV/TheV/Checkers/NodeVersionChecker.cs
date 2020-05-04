@@ -4,8 +4,8 @@ using TheV.Managers;
 
 namespace TheV.Checkers
 {
-   
-    public class NodeVersionChecker : INodeVersionChecker
+
+    internal class NodeVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
 
@@ -14,12 +14,14 @@ namespace TheV.Checkers
             _processManager = processManager;
         }
 
+        public string Title => "Node";
+
         public string GetVersion(bool verbose = false)
         {
             try
             {
                 var versionNumber = _processManager.RunCommand("node", "--version");
-                return $"node version:\n{versionNumber}";
+                return $"{versionNumber}";
             }
             catch (ArgumentException e)
             {

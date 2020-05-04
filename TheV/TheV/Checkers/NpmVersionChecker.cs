@@ -4,7 +4,7 @@ using TheV.Managers;
 namespace TheV.Checkers
 {
 
-    public class NpmVersionChecker : INpmVersionChecker
+    internal class NpmVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
 
@@ -12,6 +12,8 @@ namespace TheV.Checkers
         {
             _processManager = processManager;
         }
+
+        public string Title => "Npm";
 
         public string GetVersion(bool verbose = true)
         {

@@ -3,7 +3,7 @@ using TheV.Managers;
 
 namespace TheV.Checkers
 {
-    public class NetCoreRuntimeVersionChecker : INetCoreRuntimeVersionChecker
+    internal class NetCoreRuntimeVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
 
@@ -11,10 +11,12 @@ namespace TheV.Checkers
         {
             _processManager = processManager;
         }
+        public string Title => ".NET Core runtime";
+
         public string GetVersion(bool verbose = false)
         {
 
-            return ".NET Core runtimes installed:\n" + _processManager.RunCommand("dotnet", "--list-runtimes");
+            return _processManager.RunCommand("dotnet", "--list-runtimes");
 
             //var resultCollection = new Collection<string>();
 

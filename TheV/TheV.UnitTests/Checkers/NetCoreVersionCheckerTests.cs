@@ -2,18 +2,18 @@
 using TheV.Checkers;
 using TheV.Managers;
 
-namespace TheV.UnitTests.Handlers
+namespace TheV.UnitTests.Checkers
 {
     [TestClass]
-    public class NetCoreVersionHandlerTests
+    public class NetCoreVersionCheckerTests
     {
         [TestMethod]
         public void GetNetCoreVersion()
         {
             var handler = new NetCoreRuntimeVersionChecker(new ProcessManager());
-            handler.GetVersion();
+            var result = handler.GetVersion();
 
-            // Assert.IsTrue(result.Caption.Contains("Windows"));
+            Assert.IsTrue(result.Contains("Windows"));
 
         }
 
