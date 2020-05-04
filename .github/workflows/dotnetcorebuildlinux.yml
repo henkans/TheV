@@ -20,5 +20,6 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
+      working-directory: ./TheV
       run: dotnet build --configuration Release --no-restore
 
