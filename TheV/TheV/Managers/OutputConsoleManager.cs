@@ -1,25 +1,79 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection;
+using System.Text;
 using TheV.Checkers.Interfaces;
+using TheV.Models;
 
 namespace TheV.Managers
 {
     public interface IOutputConsoleManager
     {
-        void Write(IVersionChecker versionChecker);
+        void WriteVersion(IVersionChecker versionChecker, InputParameters inputParameters);
+        void WriteHeader(InputParameters inputParameters);
+        void WriteFooter(InputParameters inputParameters);
     }
 
     public class OutputConsoleManager : IOutputConsoleManager
     {
-        public void Write(IVersionChecker versionChecker)
+        public string AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
+
+
+        public void WriteVersion(IVersionChecker versionChecker, InputParameters inputParameters)
         {
+            if (inputParameters.Verbose)
+            {
+                WriteTitle(versionChecker.Title);
+                WriteVersion(versionChecker.GetVersion(inputParameters));
+            }
+            else
+            {
+                WriteVersion(versionChecker.GetVersion(inputParameters));
+            }
             // Print Title
-            WriteTitle(versionChecker.Title);
+            //WriteTitle(versionChecker.Title);
 
             // Print Version
-            WriteVersion(versionChecker.GetVersion());
+            
         }
 
-        private void WriteTitle(string title, ConsoleColor? color = ConsoleColor.DarkGreen)
+        public void WriteHeader(InputParameters inputParameterse)
+        {
+            var stringBuilder = new StringBuilder();
+            if (inputParameterse.Verbose)
+            {
+                stringBuilder.AppendLine(@"  _____ _      __   __");
+                stringBuilder.AppendLine(@" |_   _| |_  __\ \ / /");
+                stringBuilder.AppendLine(@"   | | | ' \/ -_) V / ");
+                stringBuilder.AppendLine(@"   |_| |_||_\___|\_/  ");
+                stringBuilder.AppendLine(@" ---------------------");
+                Console.WriteLine(stringBuilder.ToString());
+            }
+            else
+            {
+                WriteLineColored($"TheV (The version) {AssemblyVersion}", ConsoleColor.Black, ConsoleColor.DarkGray);
+                WriteLineColored($"Checked { DateTime.Now }", ConsoleColor.Black, ConsoleColor.DarkGray);
+            }
+        }
+
+        public void WriteFooter(InputParameters inputParameterse)
+        {
+            var stringBuilder = new StringBuilder();
+            if (inputParameterse.Verbose)
+            {
+                stringBuilder.AppendLine(@"  Fot");
+
+                Console.WriteLine(stringBuilder.ToString());
+            }
+            else
+            {
+                // https://github.com/henkans/TheV
+                WriteLineColored($"Checked { DateTime.Now }", ConsoleColor.Black, ConsoleColor.DarkGray);
+            }
+        }
+
+        private void WriteTitle(string title, ConsoleColor? color = ConsoleColor.DarkGreen, bool verbose = false)
         {
             if (Console.IsOutputRedirected)
             {
@@ -49,14 +103,57 @@ namespace TheV.Managers
             Console.WriteLine();
         }
 
-        private void WriteVersion(string version)
+        private void WriteVersion(IEnumerable<CheckerResult> checkerResults)
         {
             if (Console.IsOutputRedirected)
             {
-                Console.Out.WriteLine(version);
+                foreach (var checkerResult in checkerResults)
+                {
+                    Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
+                }
+                //Console.Out.WriteLine(version);
                 return;
             }
-            Console.WriteLine($"{version}");
+
+
+            //ar paddingWithChar = new string('.', 10);
+            //padding with dots
+            
+
+            foreach (var checkerResult in checkerResults)
+            {
+
+                Console.WriteLine($"{PaddingWithDots(checkerResult.Name)}{checkerResult.Version}");
+               // Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
+            }
+
+            
         }
+
+
+        private void WriteLineColored(string text, ConsoleColor foregroundColor, ConsoleColor? backgroundColor = null)
+        {
+            var originalForegroundColor = Console.ForegroundColor;
+            var originalBackgroundColor = Console.BackgroundColor;
+
+            Console.ForegroundColor = foregroundColor;
+            if (backgroundColor.HasValue) Console.BackgroundColor = backgroundColor.Value;
+
+            Console.Write("{0, -" + (Console.WindowWidth-1) + "}", $" {text} ");
+            Console.ForegroundColor = originalForegroundColor;
+            Console.BackgroundColor = originalBackgroundColor;
+            Console.WriteLine();
+        }
+
+        private string PaddingWithDots(string name)
+        {
+            var maxLength = 20;
+            if(string.IsNullOrWhiteSpace(name)) return new string(' ', maxLength + 2); 
+
+            if (name.Length >= maxLength) name = name.Substring(0, maxLength);
+            var paddingWithDots = new string('.', maxLength - name.Length);
+            return $"{name}{paddingWithDots}: ";
+        }
+
     }
 }

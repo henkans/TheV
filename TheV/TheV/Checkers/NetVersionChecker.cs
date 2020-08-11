@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using TheV.Checkers.Interfaces;
+using TheV.Models;
 
 namespace TheV.Checkers
 {
@@ -11,8 +13,10 @@ namespace TheV.Checkers
 
         public string Title => ".NET Framework";
 
-        public string GetVersion(bool verbose = true)
+        public IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters)
         {
+            var versionResults = new Collection<CheckerResult>();
+            //Windows
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Get Net version on Wondows from registry
@@ -20,13 +24,17 @@ namespace TheV.Checkers
                 using var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey);
                 if (ndpKey != null && ndpKey.GetValue("Release") != null)
                 {
-                    return $"{CheckFor45PlusVersion((int) ndpKey.GetValue("Release"))}\n";
+                    versionResults.Add(new CheckerResult(Title, $"{CheckFor45PlusVersion((int)ndpKey.GetValue("Release"))}"));
                 }
-                return ".NET Framework Version 4.5 or later is not detected.\n";
+                else
+                {
+                    versionResults.Add(new CheckerResult(Title, ".NET Framework Version 4.5 or later is not detected."));
+                }
+                
             }
 
             // If linux return empty
-            return string.Empty;
+            return versionResults;
 
 
         }
@@ -123,6 +131,10 @@ namespace TheV.Checkers
 
                 return netVersions;
             }
+        }
+        public void Dispose()
+        {
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
     }
 }

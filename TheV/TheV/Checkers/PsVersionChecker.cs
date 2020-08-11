@@ -3,7 +3,7 @@ using TheV.Checkers.Interfaces;
 
 namespace TheV.Checkers
 {
-    internal class PsVersionChecker : IVersionChecker
+    internal class PsVersionChecker //: IVersionChecker
     {
         public string Title => "Powershell";
 

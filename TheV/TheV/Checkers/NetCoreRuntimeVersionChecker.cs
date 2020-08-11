@@ -1,5 +1,9 @@
-﻿using TheV.Checkers.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using TheV.Checkers.Interfaces;
 using TheV.Managers;
+using TheV.Models;
 
 namespace TheV.Checkers
 {
@@ -13,10 +17,53 @@ namespace TheV.Checkers
         }
         public string Title => ".NET Core runtime";
 
-        public string GetVersion(bool verbose = false)
+        public IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters)
         {
+            //TODO Do verbose & Debug...
 
-            return _processManager.RunCommand("dotnet", "--list-runtimes");
+            //switch (outputType)
+            //{
+                
+            //}
+
+
+            var versions = _processManager.RunCommand("dotnet", "--list-runtimes");
+            string[] splittedVersions = versions.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            var versionResults = new Collection<CheckerResult>();
+            var addName = true;
+
+            foreach (var splittedVersion in splittedVersions)
+            {
+                var outputVersion = splittedVersion;
+                
+                // do not show path...
+                if (inputParameters.Verbose)
+                {
+                    outputVersion = splittedVersion;
+                }
+                else
+                {
+                    string[] words = splittedVersion.Split(' ');
+                    outputVersion = words[0] + ' ' + words[1];
+                    
+                }
+
+                if (addName) versionResults.Add(new CheckerResult(Title, outputVersion));
+                else versionResults.Add(new CheckerResult(string.Empty, outputVersion));
+                addName = false;
+            }
+
+
+            //var versionResults = new Collection<CheckerResult>
+            //{
+            //    new CheckerResult(Title, _processManager.RunCommand("dotnet", "--list-runtimes"))
+            //};
+
+            return versionResults;
+
+
+            //return _processManager.RunCommand("dotnet", "--list-runtimes");
 
             //var resultCollection = new Collection<string>();
 
@@ -85,6 +132,11 @@ namespace TheV.Checkers
 
         //}
 
+
+        public void Dispose()
+        {
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+        }
 
     }
 }

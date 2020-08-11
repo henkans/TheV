@@ -4,7 +4,7 @@ using TheV.Managers;
 namespace TheV.Checkers
 {
 
-    internal class NpmVersionChecker : IVersionChecker
+    internal class NpmVersionChecker //: IVersionChecker
     {
         private readonly IProcessManager _processManager;
 

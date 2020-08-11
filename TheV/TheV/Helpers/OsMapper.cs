@@ -15,7 +15,7 @@ namespace TheV.Helpers
             if (managementObject["Version"] != null) os.Version = managementObject["Version"].ToString();
             if (managementObject["BuildNumber"] != null) os.BuildNumber = managementObject["BuildNumber"].ToString();
             if (managementObject["Manufacturer"] != null) os.Manufacturer = managementObject["Manufacturer"].ToString();
-            if (managementObject["OSArchitecture"] != null) os.OSArchitecture = managementObject["OSArchitecture"].ToString();
+            //if (managementObject["OSArchitecture"] != null) os.OSArchitecture = managementObject["OSArchitecture"].ToString();
             if (managementObject["CSName"] != null) os.ComputerName = managementObject["CSName"].ToString();
             if (managementObject["CSDVersion"] != null) os.ServicePack = managementObject["CSDVersion"].ToString();
             return os;

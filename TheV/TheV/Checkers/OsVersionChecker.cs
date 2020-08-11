@@ -30,7 +30,7 @@ public static class OperatingSystem
      */
 
 
-    internal class OsVersionChecker : IVersionChecker
+    internal class OsVersionChecker //: IVersionChecker
     {
 
         public string Title => "Operating System";

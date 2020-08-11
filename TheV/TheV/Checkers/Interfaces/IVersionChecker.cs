@@ -1,8 +1,12 @@
-﻿namespace TheV.Checkers.Interfaces
+﻿using System;
+using System.Collections.Generic;
+using TheV.Models;
+
+namespace TheV.Checkers.Interfaces
 {
-    public interface IVersionChecker
+    public interface IVersionChecker : IDisposable
     {
         string Title { get; }
-        string GetVersion(bool verbose = false);
+        IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters);
     }
 }

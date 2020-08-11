@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using TheV.Checkers.Interfaces;
 using TheV.Managers;
+using TheV.Models;
 
 namespace TheV.Checkers
 {
@@ -16,19 +19,30 @@ namespace TheV.Checkers
 
         public string Title => "Node";
 
-        public string GetVersion(bool verbose = false)
+        public IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters)
         {
             try
             {
                 var versionNumber = _processManager.RunCommand("node", "--version");
-                return $"{versionNumber}";
+                var versionResults = new Collection<CheckerResult>
+                {
+                    new CheckerResult(Title, versionNumber)
+                };
+
+                return versionResults;
+                //return $"{versionNumber}";
             }
             catch (ArgumentException e)
             {
                 //Console.WriteLine(e);
-                //throw;
-                return $"node is not found.";
+                throw;
+                //return $"node is not found.";
             }
+        }
+
+        public void Dispose()
+        {
+            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
         }
 
     }
