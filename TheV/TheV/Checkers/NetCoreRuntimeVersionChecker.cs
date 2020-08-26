@@ -10,6 +10,7 @@ namespace TheV.Checkers
     internal class NetCoreRuntimeVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
+        private InputParameters _inputParameters;
 
         public NetCoreRuntimeVersionChecker(IProcessManager processManager)
         {
@@ -17,126 +18,99 @@ namespace TheV.Checkers
         }
         public string Title => ".NET Core runtime";
 
-        public IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters)
+        public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
-            //TODO Do verbose & Debug...
+            // Init parameters
+            _inputParameters = inputParameters;
 
-            //switch (outputType)
-            //{
-                
-            //}
-
-
+            // Run  command
             var versions = _processManager.RunCommand("dotnet", "--list-runtimes");
+
+            // Get rows
             string[] splittedVersions = versions.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            var versionResults = new Collection<CheckerResult>();
-            var addName = true;
+            // Rest 
+            //return GetVersionList(splittedVersions);
+            var versionDic = new Dictionary<string, Version>();
+            var result = new Collection<VersionCheck>();
 
-            foreach (var splittedVersion in splittedVersions)
+            foreach (var row in splittedVersions)
             {
-                var outputVersion = splittedVersion;
-                
-                // do not show path...
-                if (inputParameters.Verbose)
+                string[] words = row.Split(' ');
+                if (_inputParameters.Verbose)
                 {
-                    outputVersion = splittedVersion;
+                    result.Add(new VersionCheck(words[0], words[1]));
+                }
+                else if (versionDic.TryGetValue(words[0], out Version existingVersion) && !_inputParameters.Verbose)
+                {
+                    var newVersion = new Version(words[1]);
+                    if (newVersion > existingVersion)
+                    {
+                        versionDic[words[0]] = newVersion;
+                    }
                 }
                 else
                 {
-                    string[] words = splittedVersion.Split(' ');
-                    outputVersion = words[0] + ' ' + words[1];
-                    
+                    versionDic.Add(words[0], new Version(words[1]));
                 }
+            }
 
-                if (addName) versionResults.Add(new CheckerResult(Title, outputVersion));
-                else versionResults.Add(new CheckerResult(string.Empty, outputVersion));
-                addName = false;
+            
+            // convert to ICollection<VersionCheck>
+            if (!_inputParameters.Verbose)
+            {
+                foreach (var version in versionDic)
+                {
+                    result.Add(new VersionCheck(version.Key, version.Value.ToString()));
+                }
             }
 
 
-            //var versionResults = new Collection<CheckerResult>
-            //{
-            //    new CheckerResult(Title, _processManager.RunCommand("dotnet", "--list-runtimes"))
-            //};
+            return result;
 
-            return versionResults;
-
-
-            //return _processManager.RunCommand("dotnet", "--list-runtimes");
-
-            //var resultCollection = new Collection<string>();
-
-            //resultCollection.Add(_processManager.RunCommand("dotnet", "--version"));
-
-            //return _processManager.RunCommand("dotnet", "--list-runtimes");
-
-            // dotnet --list-sdks
-            // dotnet --list-runtimes
-
-
-            //npm list
-
-            //npm --version
-            //npm version
-
-            //node --version   Node.js
-
-            // dotnet --
-            // dotnet --runtime
-
-            // dotnet --info
-
-
-
-            //var process = new Process
-            //{
-            //    StartInfo = new ProcessStartInfo
-            //    {
-            //        FileName = "dotnet",
-            //        Arguments = "--version",  //--info
-            //        UseShellExecute = false,
-            //        RedirectStandardOutput = true,
-            //        RedirectStandardError = true,
-            //        CreateNoWindow = true
-            //    }
-
-            //};
-
-            //process.OutputDataReceived += (sender, data) => {
-            //    Console.WriteLine(data.Data);
-            //    Debug.WriteLine(data.Data);
-            //};
-
-            //process.ErrorDataReceived += (sender, data) => {
-            //    Console.WriteLine(data.Data);
-            //    Debug.WriteLine(data.Data);
-            //};
-
-
-            //process.Start();
 
 
         }
+        
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
 
-        public string GetAllRuntimes()
+        protected virtual void Dispose(bool disposing)
         {
-            return _processManager.RunCommand("dotnet", "--list-runtimes");
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
 
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
         }
 
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~A() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
 
-        //public string GetAllSdks()
-        //{
-        //    return _processManager.RunCommand("--list-sdks");
-
-        //}
-
-
+        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            if (_inputParameters.Debug)
+            {
+                Console.WriteLine($"debug: {GetType().Name} was disposed!");
+            }
+
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
         }
+        #endregion 
 
     }
 }

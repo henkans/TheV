@@ -12,16 +12,17 @@ namespace TheV.Checkers
 {
     internal class ComputerChecker : IVersionChecker
     {
+        private InputParameters _inputParameters;
         public string Title => "Computer";
 
-        public IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters)
+        public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
-
-            var versionResults = new Collection<CheckerResult>
+            _inputParameters = inputParameters;
+            var versionResults = new Collection<VersionCheck>
             {
-                new CheckerResult("Machine", Environment.MachineName),
-                new CheckerResult("Ip", LocalIpAddress().ToString()),
-                new CheckerResult("Mac", MacAddress())
+                new VersionCheck("Machine", Environment.MachineName),
+                new VersionCheck("Ip", LocalIpAddress().ToString()),
+                new VersionCheck("Mac", MacAddress())
             };
             return versionResults;
         }
@@ -74,7 +75,11 @@ namespace TheV.Checkers
         // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            if (_inputParameters.Debug)
+            {
+                Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            }
+            
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
             // TODO: uncomment the following line if the finalizer is overridden above.

@@ -10,6 +10,7 @@ namespace TheV.Checkers
     internal class NetCoreSdkVersionChecker: IVersionChecker
     {
         private readonly IProcessManager _processManager;
+        private InputParameters _inputParameters;
 
 
         public NetCoreSdkVersionChecker(IProcessManager processManager)
@@ -19,23 +20,17 @@ namespace TheV.Checkers
 
         public string Title => ".NET Core SDK";
 
-        public IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters)
+        public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
-            //var versionResults = new Collection<CheckerResult>
-            //{
-            //    new CheckerResult(Title, _processManager.RunCommand("dotnet", "--version"))
-            //};
+            _inputParameters = inputParameters;
 
 
             var versionInUse = _processManager.RunCommand("dotnet", "--version").Trim('\n').Trim('\r');
-  
+            var allVersions = _processManager.RunCommand("dotnet", "--list-sdks");
 
+            string[] splittedVersions = allVersions.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            var versions = _processManager.RunCommand("dotnet", "--list-sdks");
-            string[] splittedVersions = versions.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-
-            var versionResults = new Collection<CheckerResult>();
-            var addName = true;
+            var versionResults = new Collection<VersionCheck>();
 
             foreach (var splittedVersion in splittedVersions)
             {
@@ -58,9 +53,8 @@ namespace TheV.Checkers
                     
                 }
 
-                if (addName) versionResults.Add(new CheckerResult(Title, outputVersion));
-                else versionResults.Add(new CheckerResult(string.Empty, outputVersion));
-                addName = false;
+                versionResults.Add(new VersionCheck(string.Empty, outputVersion));
+               
             }
 
 
@@ -70,7 +64,10 @@ namespace TheV.Checkers
 
         public void Dispose()
         {
-            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            if (_inputParameters.Debug)
+            {
+                Console.WriteLine($"debug: {GetType().Name} was disposed!");
+            }
         }
     }
 }

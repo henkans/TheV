@@ -11,6 +11,7 @@ namespace TheV.Checkers
     internal class NodeVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
+        private InputParameters _inputParameters;
 
         public NodeVersionChecker(IProcessManager processManager)
         {
@@ -19,14 +20,15 @@ namespace TheV.Checkers
 
         public string Title => "Node";
 
-        public IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters)
+        public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
+            _inputParameters = inputParameters;
             try
             {
                 var versionNumber = _processManager.RunCommand("node", "--version");
-                var versionResults = new Collection<CheckerResult>
+                var versionResults = new Collection<VersionCheck>
                 {
-                    new CheckerResult(Title, versionNumber)
+                    new VersionCheck(Title, versionNumber)
                 };
 
                 return versionResults;
@@ -42,7 +44,10 @@ namespace TheV.Checkers
 
         public void Dispose()
         {
-            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            if (_inputParameters.Debug)
+            {
+                Console.WriteLine($"debug: {GetType().Name} was disposed!");
+            }
         }
 
     }

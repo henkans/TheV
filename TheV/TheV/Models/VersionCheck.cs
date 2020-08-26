@@ -3,9 +3,9 @@
 namespace TheV.Models
 {
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
-    public class CheckerResult
+    public class VersionCheck
     {
-        public CheckerResult(string name, string version)
+        public VersionCheck(string name, string version)
         {
             Name = name;
             Version = version;

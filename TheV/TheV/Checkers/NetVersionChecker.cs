@@ -10,12 +10,14 @@ namespace TheV.Checkers
 {
     internal class NetVersionChecker : IVersionChecker
     {
+        private InputParameters _inputParameters;
 
         public string Title => ".NET Framework";
 
-        public IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters)
+        public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
-            var versionResults = new Collection<CheckerResult>();
+            _inputParameters = inputParameters;
+            var versionResults = new Collection<VersionCheck>();
             //Windows
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -24,11 +26,11 @@ namespace TheV.Checkers
                 using var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey);
                 if (ndpKey != null && ndpKey.GetValue("Release") != null)
                 {
-                    versionResults.Add(new CheckerResult(Title, $"{CheckFor45PlusVersion((int)ndpKey.GetValue("Release"))}"));
+                    versionResults.Add(new VersionCheck(Title, $"{CheckFor45PlusVersion((int)ndpKey.GetValue("Release"))}"));
                 }
                 else
                 {
-                    versionResults.Add(new CheckerResult(Title, ".NET Framework Version 4.5 or later is not detected."));
+                    versionResults.Add(new VersionCheck(Title, ".NET Framework Version 4.5 or later is not detected."));
                 }
                 
             }
@@ -134,7 +136,10 @@ namespace TheV.Checkers
         }
         public void Dispose()
         {
-            Console.WriteLine("- {0} was disposed!", this.GetType().Name);
+            if (_inputParameters.Debug)
+            {
+                Console.WriteLine($"debug: {GetType().Name} was disposed!");
+            }
         }
     }
 }

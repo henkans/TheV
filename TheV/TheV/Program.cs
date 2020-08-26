@@ -48,7 +48,7 @@ namespace TheV
             rootCommand.Handler = CommandHandler.Create<bool, bool>(
                 (verbose, debug) =>
                 {
-                    _serviceProvider = BuildServiceProvider();
+                    _serviceProvider = BuildServiceProvider(new InputParameters(verbose, debug));
                     RunVersionCheckers(new InputParameters(verbose, debug));
                 });
 
@@ -91,7 +91,7 @@ namespace TheV
 
 
 
-        public static ServiceProvider BuildServiceProvider()
+        public static ServiceProvider BuildServiceProvider(InputParameters inputParameters)
         {
             return new ServiceCollection()
                 .AddLogging(logging =>
@@ -102,14 +102,14 @@ namespace TheV
                 })
                 .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Debug)
 
-                .AddSingleton<IProcessManager, ProcessManager>() //Singleton
-               // .AddScoped<IVersionCheckerManager, VersionCheckerManager>() // Note Do all work here?
+                .AddSingleton<IProcessManager, ProcessManager>() //Singleton? not if scale up...
                 .AddScoped<IOutputConsoleManager, OutputConsoleManager>()
 
-                //add all version handlers
+                //add all version checkers
                 .AddScoped<IVersionChecker, ComputerChecker>()
                 // .AddScoped<IVersionChecker, OsVersionChecker>()
                 .AddScoped<IVersionChecker, NetCoreRuntimeVersionChecker>()
+ 
                 .AddScoped<IVersionChecker, NetCoreSdkVersionChecker>()
                 .AddScoped<IVersionChecker, NetVersionChecker>()
                 .AddScoped<IVersionChecker, NodeVersionChecker>()

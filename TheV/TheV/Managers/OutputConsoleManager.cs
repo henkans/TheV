@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Reflection;
 using System.Text;
 using TheV.Checkers.Interfaces;
@@ -8,6 +7,8 @@ using TheV.Models;
 
 namespace TheV.Managers
 {
+
+    //TODO Check out http://colorfulconsole.com/
     public interface IOutputConsoleManager
     {
         void WriteVersion(IVersionChecker versionChecker, InputParameters inputParameters);
@@ -29,13 +30,13 @@ namespace TheV.Managers
             }
             else
             {
-                WriteVersion(versionChecker.GetVersion(inputParameters));
+                WriteVersion(versionChecker.Title, versionChecker.GetVersion(inputParameters));
             }
             // Print Title
             //WriteTitle(versionChecker.Title);
 
             // Print Version
-            
+
         }
 
         public void WriteHeader(InputParameters inputParameterse)
@@ -103,7 +104,7 @@ namespace TheV.Managers
             Console.WriteLine();
         }
 
-        private void WriteVersion(IEnumerable<CheckerResult> checkerResults)
+        private void WriteVersion(IEnumerable<VersionCheck> checkerResults)
         {
             if (Console.IsOutputRedirected)
             {
@@ -118,16 +119,39 @@ namespace TheV.Managers
 
             //ar paddingWithChar = new string('.', 10);
             //padding with dots
-            
+
 
             foreach (var checkerResult in checkerResults)
             {
 
                 Console.WriteLine($"{PaddingWithDots(checkerResult.Name)}{checkerResult.Version}");
-               // Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
+                // Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
             }
 
-            
+
+        }
+
+        private void WriteVersion(string title, IEnumerable<VersionCheck> checkerResults)
+        {
+            if (Console.IsOutputRedirected)
+            {
+                foreach (var checkerResult in checkerResults)
+                {
+                    Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
+                }
+                //Console.Out.WriteLine(version);
+                return;
+            }
+
+            foreach (var checkerResult in checkerResults)
+            {
+                if (Equals(!string.IsNullOrEmpty(checkerResult.Name))) checkerResult.Name = checkerResult.Name + " ";
+                Console.WriteLine($"{PaddingWithDots(title)}{checkerResult.Name}{checkerResult.Version}");
+                title = string.Empty;
+
+            }
+
+
         }
 
 
@@ -139,7 +163,7 @@ namespace TheV.Managers
             Console.ForegroundColor = foregroundColor;
             if (backgroundColor.HasValue) Console.BackgroundColor = backgroundColor.Value;
 
-            Console.Write("{0, -" + (Console.WindowWidth-1) + "}", $" {text} ");
+            Console.Write("{0, -" + (Console.WindowWidth - 1) + "}", $" {text} ");
             Console.ForegroundColor = originalForegroundColor;
             Console.BackgroundColor = originalBackgroundColor;
             Console.WriteLine();
@@ -148,7 +172,7 @@ namespace TheV.Managers
         private string PaddingWithDots(string name)
         {
             var maxLength = 20;
-            if(string.IsNullOrWhiteSpace(name)) return new string(' ', maxLength + 2); 
+            if (string.IsNullOrWhiteSpace(name)) return new string(' ', maxLength + 2);
 
             if (name.Length >= maxLength) name = name.Substring(0, maxLength);
             var paddingWithDots = new string('.', maxLength - name.Length);

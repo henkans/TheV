@@ -7,6 +7,6 @@ namespace TheV.Checkers.Interfaces
     public interface IVersionChecker : IDisposable
     {
         string Title { get; }
-        IEnumerable<CheckerResult> GetVersion(InputParameters inputParameters);
+        IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters);
     }
 }
