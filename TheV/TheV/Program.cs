@@ -50,7 +50,7 @@ namespace TheV
                 (verbose, debug) =>
                 {
                     _serviceProvider = BuildServiceProvider(new InputParameters(verbose, debug));
-                    
+
                     RunVersionCheckers(new InputParameters(verbose, debug));
                 });
 
@@ -63,7 +63,7 @@ namespace TheV
         {
             var outputConsoleManager = _serviceProvider.GetRequiredService<IOutputConsoleManager>();
             outputConsoleManager.WriteHeader(inputParameters);
-            
+
             // Run all version checkers
             var services = _serviceProvider.GetServices<IVersionChecker>();
             foreach (var service in services)
@@ -75,19 +75,25 @@ namespace TheV
                 finally
                 {
                     service?.Dispose();
-        
+
                 }
-                
+
             }
 
+
+            outputConsoleManager.WriteFooter(inputParameters);
+
             // Logger
-            var logger = _serviceProvider.GetService<ILogger<Program>>();
-            logger.LogDebug("All done!");
-            // logger.LogCritical("All done!");
-            // logger.LogError("All done!");
-            // logger.LogInformation("All done!");
-            // logger.LogWarning("All done!");
-            // logger.LogDebug("All done!");
+            if (inputParameters.Verbose)
+            {
+                var logger = _serviceProvider.GetService<ILogger<Program>>();
+                logger.LogDebug("All done!");
+                // logger.LogCritical("All done!");
+                // logger.LogError("All done!");
+                // logger.LogInformation("All done!");
+                // logger.LogWarning("All done!");
+                // logger.LogDebug("All done!");
+            }
 
         }
 
@@ -111,7 +117,7 @@ namespace TheV
                 .AddScoped<IVersionChecker, ComputerChecker>()
                 // .AddScoped<IVersionChecker, OsVersionChecker>()
                 .AddScoped<IVersionChecker, NetCoreRuntimeVersionChecker>()
- 
+
                 .AddScoped<IVersionChecker, NetCoreSdkVersionChecker>()
                 .AddScoped<IVersionChecker, NetVersionChecker>()
                 .AddScoped<IVersionChecker, NodeVersionChecker>()

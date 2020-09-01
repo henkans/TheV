@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using TheV.Lib.Checkers.Interfaces;
@@ -18,239 +19,128 @@ namespace TheV.Lib.Managers
 
     public class OutputConsoleManager : IOutputConsoleManager
     {
-        public string AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
+        // TODO extract to conf
+        private const ConsoleColor AppTextColor = ConsoleColor.Cyan;
+        private const ConsoleColor TitleColor = ConsoleColor.Yellow;
+        private const ConsoleColor LineColor = ConsoleColor.Cyan;
+        private const ConsoleColor NameColor = ConsoleColor.DarkGray;
+        private const ConsoleColor VersionColor = ConsoleColor.White;
 
 
+        private string AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
+
+        public int AppWidth {
+            get
+            {
+                var length = Console.WindowWidth;
+                if (length > 60) length = 60;
+                return length;
+            }
+        }
+        
         public void WriteVersion(IVersionChecker versionChecker, InputParameters inputParameters)
         {
-            if (inputParameters.Verbose)
-            {
-               // WriteTitle(versionChecker.Title);
-                WriteSlimTitle(versionChecker.Title);
-                WriteVersion(versionChecker.GetVersion(inputParameters));
-            }
-            else
-            {
-                WriteVersion(versionChecker.Title, versionChecker.GetVersion(inputParameters));
-            }
-            // Print Title
-            //WriteTitle(versionChecker.Title);
-
-            // Print Version
-
+            // TODO check encoding for Linux
+            Console.OutputEncoding = Encoding.GetEncoding(1252); 
+            WriteTitle(versionChecker.Title);
+            WriteVersion(versionChecker.GetVersion(inputParameters), versionChecker.Title);
         }
+
 
         public void WriteHeader(InputParameters inputParameterse)
         {
             var stringBuilder = new StringBuilder();
             if (inputParameterse.Verbose)
             {
-
                 var originalForegroundColor = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Cyan;
-
-
-                stringBuilder.AppendLine(@"  _____ _      __   __");
-                stringBuilder.AppendLine(@" |_   _| |_  __\ \ / /");
-                stringBuilder.AppendLine(@"   | | | ' \/ -_) V / ");
-                stringBuilder.AppendLine(@"   |_| |_||_\___|\_/  ");
-                //stringBuilder.AppendLine(@" ---------------------");
-                //stringBuilder.AppendLine("— Rubrik ————————————————————————————————————————————");
-                //stringBuilder.AppendLine("═Rubrik═åäö══════════════");
-               //Console.OutputEncoding = Encoding.GetEncoding(866);
-
-                Console.OutputEncoding = System.Text.Encoding.GetEncoding(1252);
+                Console.ForegroundColor = AppTextColor;
+                stringBuilder.AppendLine(@$"  _____ _      __   __");
+                stringBuilder.AppendLine(@$" |_   _| |_  __\ \ / /     The Version");
+                stringBuilder.AppendLine(@$"   | | | ' \/ -_) V /      {AssemblyVersion}");
+                stringBuilder.AppendLine(@$"   |_| |_||_\___|\_/  ");
                 Console.WriteLine(stringBuilder.ToString());
-
                 Console.ForegroundColor = originalForegroundColor;
             }
             else
             {
                 var originalForegroundColor = Console.ForegroundColor;
-                var maxLength = Console.WindowWidth;
-                if (maxLength > 60) maxLength = 60;
-                var line2 = new string('—', maxLength);
-                var lineColor = ConsoleColor.Cyan;
-                Console.ForegroundColor = lineColor;
-                Console.WriteLine(line2);
-
+                Console.ForegroundColor = LineColor;
+                Console.WriteLine(new string('—', AppWidth));
                 var titletext = $"TheV (The version) {AssemblyVersion}";
-                Console.Write(new string(' ', maxLength - titletext.Length));
+                Console.Write(new string(' ', AppWidth - titletext.Length));
                 Console.WriteLine(titletext);
-
                 Console.ForegroundColor = originalForegroundColor;
-
-                WriteSlimTitle("Test Machine");
-
-                //WriteLineColored($"TheV (The version) {AssemblyVersion}", ConsoleColor.Black, ConsoleColor.DarkGray);
-                //WriteLineColored($"Checked { DateTime.Now }", ConsoleColor.Black, ConsoleColor.DarkGray);
             }
         }
 
-        public void WriteSlimTitle(string title)
+        public void WriteTitle(string title)
         {
-            var textColor = ConsoleColor.Yellow;
-            var lineColor = ConsoleColor.Cyan;
-
             var originalForegroundColor = Console.ForegroundColor;
             var originalBackgroundColor = Console.BackgroundColor;
-
-            // Draw header
-            Console.OutputEncoding = System.Text.Encoding.GetEncoding(1252);
-            //Console.ForegroundColor = lineColor;
-            //Console.Write("—");
-            //Console.ForegroundColor = textColor;
-            //Console.Write($"{title}");
-            //Console.ForegroundColor = lineColor;
-            //Console.WriteLine("————————————————————————————————————————————");
-            //Console.WriteLine($" {title,-(40)}");
-
-            //Console.ForegroundColor = originalForegroundColor;
-            //Console.BackgroundColor = originalBackgroundColor;
-
-
-            var maxLength = Console.WindowWidth;
-            if (maxLength > 60) maxLength = 60;
-            Console.ForegroundColor = lineColor;
+            
+            Console.ForegroundColor = LineColor;
             Console.Write("—");
-            Console.ForegroundColor = textColor;
+            Console.ForegroundColor = TitleColor;
             Console.Write($"{title}");
-            var line2 = new string('—', maxLength - (title.Length + 1));
-            Console.ForegroundColor = lineColor;
-            Console.WriteLine(line2);
-
-
+            Console.ForegroundColor = LineColor;
+            Console.WriteLine(new string('—', AppWidth - (title.Length + 1)));
+            
             Console.ForegroundColor = originalForegroundColor;
             Console.BackgroundColor = originalBackgroundColor;
-
-
-            // Console.Write($" {title,-(40)}"); 
-            // HACK: To set dynamic width
-            //Console.Write("{0, -" + Console.WindowWidth / 2 + "}", $" {title} ");
-            //Console.ForegroundColor = originalForegroundColor;
-            //Console.BackgroundColor = originalBackgroundColor;
-            //Console.WriteLine();
-
-            //var stringBuilder = new StringBuilder();
-            //if (inputParameterse.Verbose)
-            //{
-            //    stringBuilder.AppendLine(@"  _____ _      __   __");
-            //    stringBuilder.AppendLine(@" |_   _| |_  __\ \ / /");
-            //    stringBuilder.AppendLine(@"   | | | ' \/ -_) V / ");
-            //    stringBuilder.AppendLine(@"   |_| |_||_\___|\_/  ");
-            //    //stringBuilder.AppendLine(@" ---------------------");
-            //    stringBuilder.AppendLine("— Rubrik ————————————————————————————————————————————");
-            //    stringBuilder.AppendLine("═Rubrik═åäö══════════════");
-            //    //Console.OutputEncoding = Encoding.GetEncoding(866);
-
-            //    Console.OutputEncoding = System.Text.Encoding.GetEncoding(1252);
-            //    Console.WriteLine(stringBuilder.ToString());
-            //}
-            //else
-            //{
-            //    WriteLineColored($"TheV (The version) {AssemblyVersion}", ConsoleColor.Black, ConsoleColor.DarkGray);
-            //    WriteLineColored($"Checked { DateTime.Now }", ConsoleColor.Black, ConsoleColor.DarkGray);
-            //}
         }
 
+        
+        private void WriteVersion(IEnumerable<VersionCheck> checkerResults, string title = "")
+        {
+            if (Console.IsOutputRedirected)
+            {
+                foreach (var checkerResult in checkerResults)
+                {
+                    Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
+                }
+                return;
+            }
+
+            var maxlength = checkerResults.Max(c => c.Name.Length);
+            if (maxlength < 20) maxlength = 20;
+
+            foreach (var checkerResult in checkerResults)
+            {
+                var originalForegroundColor = Console.ForegroundColor;
+                var originalBackgroundColor = Console.BackgroundColor;
+
+                Console.ForegroundColor = NameColor;
+                Console.Write($"{PaddingWithDots((string.IsNullOrWhiteSpace(checkerResult.Name)? title : checkerResult.Name), maxlength)}");
+                Console.ForegroundColor = VersionColor;
+                Console.WriteLine($"{checkerResult.Version}");
+
+                Console.ForegroundColor = originalForegroundColor;
+                Console.BackgroundColor = originalBackgroundColor;
+            }
+        }
 
         public void WriteFooter(InputParameters inputParameterse)
         {
-            var stringBuilder = new StringBuilder();
-            if (inputParameterse.Verbose)
-            {
-                stringBuilder.AppendLine(@"  Fot");
-
-                Console.WriteLine(stringBuilder.ToString());
-            }
-            else
-            {
-                // https://github.com/henkans/TheV
-                WriteLineColored($"Checked { DateTime.Now }", ConsoleColor.Black, ConsoleColor.DarkGray);
-            }
-        }
-
-        private void WriteTitle(string title, ConsoleColor? color = ConsoleColor.DarkGreen, bool verbose = false)
-        {
-            if (Console.IsOutputRedirected)
-            {
-                Console.Out.WriteLine(title);
-                return;
-            }
-
+            // TODO: include?
+            //https://github.com/henkans/TheV
             var originalForegroundColor = Console.ForegroundColor;
-            var originalBackgroundColor = Console.BackgroundColor;
-
-            if (color == null) // Invert color
-            {
-                Console.BackgroundColor = originalForegroundColor;
-                Console.ForegroundColor = originalBackgroundColor;
-            }
-            else
-            {
-                Console.BackgroundColor = (ConsoleColor)color;
-                Console.ForegroundColor = ConsoleColor.Black;
-            }
-
-            // Console.Write($" {title,-(40)}"); 
-            // HACK: To set dynamic width
-            Console.Write("{0, -" + Console.WindowWidth / 2 + "}", $" {title} ");
+            Console.ForegroundColor = LineColor;
+            Console.WriteLine(new string('—', AppWidth));
+            var footertext = $"Checked { DateTime.Now }";
+            Console.Write(new string(' ', AppWidth - footertext.Length));
+            Console.WriteLine(footertext);
             Console.ForegroundColor = originalForegroundColor;
-            Console.BackgroundColor = originalBackgroundColor;
-            Console.WriteLine();
         }
 
-        private void WriteVersion(IEnumerable<VersionCheck> checkerResults)
+        private string PaddingWithDots(string name, int length = 20)
         {
-            if (Console.IsOutputRedirected)
-            {
-                foreach (var checkerResult in checkerResults)
-                {
-                    Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
-                }
-                //Console.Out.WriteLine(version);
-                return;
-            }
-
-
-            //ar paddingWithChar = new string('.', 10);
-            //padding with dots
-
-
-            foreach (var checkerResult in checkerResults)
-            {
-
-                Console.WriteLine($"{PaddingWithDots(checkerResult.Name)}{checkerResult.Version}");
-                // Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
-            }
-
-
+            if (string.IsNullOrWhiteSpace(name)) return new string(' ', length + 2);
+            if (name.Length >= length) name = name.Substring(0, length);
+            var paddingWithDots = new string('.', length - name.Length);
+            return $"{name}{paddingWithDots}: ";
         }
 
-        private void WriteVersion(string title, IEnumerable<VersionCheck> checkerResults)
-        {
-            if (Console.IsOutputRedirected)
-            {
-                foreach (var checkerResult in checkerResults)
-                {
-                    Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
-                }
-                //Console.Out.WriteLine(version);
-                return;
-            }
-
-            foreach (var checkerResult in checkerResults)
-            {
-                if (Equals(!string.IsNullOrEmpty(checkerResult.Name))) checkerResult.Name = checkerResult.Name + " ";
-                Console.WriteLine($"{PaddingWithDots(title)}{checkerResult.Name}{checkerResult.Version}");
-                title = string.Empty;
-
-            }
-
-
-        }
-
-
+        // Saved for future use...?
         private void WriteLineColored(string text, ConsoleColor foregroundColor, ConsoleColor? backgroundColor = null)
         {
             var originalForegroundColor = Console.ForegroundColor;
@@ -264,16 +154,5 @@ namespace TheV.Lib.Managers
             Console.BackgroundColor = originalBackgroundColor;
             Console.WriteLine();
         }
-
-        private string PaddingWithDots(string name)
-        {
-            var maxLength = 20;
-            if (string.IsNullOrWhiteSpace(name)) return new string(' ', maxLength + 2);
-
-            if (name.Length >= maxLength) name = name.Substring(0, maxLength);
-            var paddingWithDots = new string('.', maxLength - name.Length);
-            return $"{name}{paddingWithDots}: ";
-        }
-
     }
 }
