@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TheV\TheV.csproj" />
+    <ProjectReference Include="..\TheV.Lib\TheV.Lib.csproj" />
   </ItemGroup>
 
 </Project>

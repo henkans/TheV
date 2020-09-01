@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using TheV.Checkers;
-using TheV.Checkers.Interfaces;
-using TheV.Managers;
-using TheV.Models;
+using TheV.Lib.Checkers;
+using TheV.Lib.Checkers.Interfaces;
+using TheV.Lib.Managers;
+using TheV.Lib.Models;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.Text;
 using System.Threading.Tasks;
 
 
@@ -20,7 +21,7 @@ namespace TheV
 
         static async Task Main(string[] args)
         {
-
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             // Get command line parameters
             RootCommand rootCommand = new RootCommand("TheV - Version checker");
@@ -49,6 +50,7 @@ namespace TheV
                 (verbose, debug) =>
                 {
                     _serviceProvider = BuildServiceProvider(new InputParameters(verbose, debug));
+                    
                     RunVersionCheckers(new InputParameters(verbose, debug));
                 });
 

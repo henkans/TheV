@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TheV.Checkers;
-using TheV.Models;
+using TheV.Lib.Checkers;
+using TheV.Lib.Models;
 using TheV.UnitTests.Mocks;
 
 namespace TheV.UnitTests.Checkers
@@ -11,9 +11,7 @@ namespace TheV.UnitTests.Checkers
     {
         private readonly ProcessManagerMock _processManagerMock;
 
-        // Test cases
-        // Get Sdks
-        // Get Sdks Verbose
+        // TODO Test cases
         // No sdk exits. Error..
 
         public NetCoreSdkVersionCheckerTests()
@@ -28,12 +26,30 @@ namespace TheV.UnitTests.Checkers
         {
             //Arrange
             var handler = new NetCoreSdkVersionChecker(_processManagerMock);
+            _processManagerMock.AddExpectation("dotnet", "--version", "3.1.401\r\n");
 
             //Act
-            var result = handler.GetVersion(new InputParameters(false, false));
+            var result = handler.GetVersion(new InputParameters(false, false)).ToArray();
 
             //Assert
-            Assert.IsTrue(result.Any(x => x.Version == "3.1.401  *In use"));
+            Assert.IsTrue(result.Length == 1);
+            Assert.IsTrue(result.Any(x => x.Version == "3.1.401"));
+
+        }
+
+        [TestMethod]
+        public void GetNetSdkCoreVersion_NotUsingNewestVersion()
+        {
+            //Arrange
+            var handler = new NetCoreSdkVersionChecker(_processManagerMock);
+            _processManagerMock.AddExpectation("dotnet", "--version", "3.1.202\r\n");
+
+            //Act
+            var result = handler.GetVersion(new InputParameters(false, false)).ToArray();
+
+            //Assert
+            Assert.IsTrue(result.Length == 2);
+            Assert.IsTrue(result.Any(x => x.Version == "3.1.202  *In use"));
 
         }
 
@@ -42,6 +58,7 @@ namespace TheV.UnitTests.Checkers
         {
             //Arrange
             var handler = new NetCoreSdkVersionChecker(_processManagerMock);
+            _processManagerMock.AddExpectation("dotnet", "--version", "3.1.401\r\n");
 
             //Act
             var result = handler.GetVersion(new InputParameters(true, false)).ToArray();
@@ -49,7 +66,7 @@ namespace TheV.UnitTests.Checkers
             //Assert
             // Assert.IsTrue(result.Any(x => x.Version == "3.1.401  *In use"));
             Assert.IsTrue(result.Length == 4);
-            Assert.IsTrue(result.Any(x => x.Version.Contains("3.1.401")));
+            Assert.IsTrue(result.Any(x => x.Version.Contains("3.1.401  *In use")));
         }
     }
 }

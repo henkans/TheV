@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using TheV.Checkers.Interfaces;
-using TheV.Managers;
-using TheV.Models;
+using TheV.Lib.Checkers.Interfaces;
+using TheV.Lib.Managers;
+using TheV.Lib.Models;
 
-namespace TheV.Checkers
+namespace TheV.Lib.Checkers
 {
-    internal class NetCoreRuntimeVersionChecker : IVersionChecker
+    public class NetCoreRuntimeVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
         private InputParameters _inputParameters;

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace TheV.Helpers
+namespace TheV.Lib.Helpers
 {
     public static class ShellHelper
     {

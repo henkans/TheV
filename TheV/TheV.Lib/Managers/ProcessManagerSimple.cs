@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
-using TheV.Models;
 
-namespace TheV.Managers
+namespace TheV.Lib.Managers
 {
     public class ProcessManagerSimple : IProcessManager
     {

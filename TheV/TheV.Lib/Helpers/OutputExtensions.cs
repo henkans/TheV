@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace TheV.Helpers
+namespace TheV.Lib.Helpers
 {
     public static class OutputExtensions
     {

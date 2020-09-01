@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheV.Models
+namespace TheV.Lib.Models
 {
     public class DataEventArgs : EventArgs
     {

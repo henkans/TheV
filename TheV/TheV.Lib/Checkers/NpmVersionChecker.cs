@@ -1,10 +1,9 @@
-﻿using TheV.Checkers.Interfaces;
-using TheV.Managers;
+﻿using TheV.Lib.Managers;
 
-namespace TheV.Checkers
+namespace TheV.Lib.Checkers
 {
 
-    internal class NpmVersionChecker //: IVersionChecker
+    public class NpmVersionChecker //: IVersionChecker
     {
         private readonly IProcessManager _processManager;
 

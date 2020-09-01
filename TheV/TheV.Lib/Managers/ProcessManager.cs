@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using TheV.Models;
+using TheV.Lib.Models;
 
-namespace TheV.Managers
+namespace TheV.Lib.Managers
 {
 
 

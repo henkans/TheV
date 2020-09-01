@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using TheV.Checkers.Interfaces;
-using TheV.Models;
+using TheV.Lib.Checkers.Interfaces;
+using TheV.Lib.Models;
 
-namespace TheV.Checkers
+namespace TheV.Lib.Checkers
 {
-    internal class ComputerChecker : IVersionChecker
+    public class ComputerChecker : IVersionChecker
     {
         private InputParameters _inputParameters;
         public string Title => "Computer";
@@ -21,7 +22,7 @@ namespace TheV.Checkers
             var versionResults = new Collection<VersionCheck>
             {
                 new VersionCheck("Machine", Environment.MachineName),
-                new VersionCheck("Ip", LocalIpAddress().ToString()),
+                //new VersionCheck("Ip", LocalIpAddress().ToString()),
                 new VersionCheck("Mac", MacAddress())
             };
             return versionResults;
@@ -44,6 +45,61 @@ namespace TheV.Checkers
                 .FirstOrDefault();
         }
 
+        private static string GetPublicIP()
+        {
+            string myPublicIp = "";
+            WebRequest request = WebRequest.Create("http://www..org/");
+            using (WebResponse response = request.GetResponse())
+            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+            {
+                myPublicIp = stream.ReadToEnd();
+            }
+            return myPublicIp;
+        }
+
+
+        private static string GetLocalIpAddress()
+        {
+            UnicastIPAddressInformation mostSuitableIp = null;
+            var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (var network in networkInterfaces)
+            {
+                if (network.OperationalStatus != OperationalStatus.Up)
+                    continue;
+
+                var properties = network.GetIPProperties();
+                if (properties.GatewayAddresses.Count == 0)
+                    continue;
+
+                foreach (var address in properties.UnicastAddresses)
+                {
+                    if (address.Address.AddressFamily != AddressFamily.InterNetwork)
+                        continue;
+
+                    if (IPAddress.IsLoopback(address.Address))
+                        continue;
+
+                    if (!address.IsDnsEligible)
+                    {
+                        if (mostSuitableIp == null)
+                            mostSuitableIp = address;
+                        continue;
+                    }
+
+                    // The best IP is the IP got from DHCP server  
+                    if (address.PrefixOrigin != PrefixOrigin.Dhcp)
+                    {
+                        if (mostSuitableIp == null || !mostSuitableIp.IsDnsEligible)
+                            mostSuitableIp = address;
+                        continue;
+                    }
+                    return address.Address.ToString();
+                }
+            }
+            return mostSuitableIp != null
+                ? mostSuitableIp.Address.ToString()
+                : "";
+        }
 
 
 

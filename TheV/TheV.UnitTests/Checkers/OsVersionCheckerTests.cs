@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TheV.Checkers;
+using TheV.Lib.Checkers;
 
 namespace TheV.UnitTests.Checkers
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using TheV.Models;
+using TheV.Lib.Models;
 
-namespace TheV.Checkers.Interfaces
+namespace TheV.Lib.Checkers.Interfaces
 {
     public interface IVersionChecker : IDisposable
     {

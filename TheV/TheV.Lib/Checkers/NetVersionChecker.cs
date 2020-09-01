@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
-using TheV.Checkers.Interfaces;
-using TheV.Models;
+using TheV.Lib.Checkers.Interfaces;
+using TheV.Lib.Models;
 
-namespace TheV.Checkers
+namespace TheV.Lib.Checkers
 {
-    internal class NetVersionChecker : IVersionChecker
+    public class NetVersionChecker : IVersionChecker
     {
         private InputParameters _inputParameters;
 

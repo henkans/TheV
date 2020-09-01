@@ -1,12 +1,11 @@
 ﻿using System.Management;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using TheV.Checkers.Interfaces;
-using TheV.Helpers;
-using TheV.Models;
+using TheV.Lib.Helpers;
+using TheV.Lib.Models;
 
 [assembly: InternalsVisibleTo("TheV.UnitTests")]
-namespace TheV.Checkers
+namespace TheV.Lib.Checkers
 {
 
 
@@ -30,7 +29,7 @@ public static class OperatingSystem
      */
 
 
-    internal class OsVersionChecker //: IVersionChecker
+    public class OsVersionChecker //: IVersionChecker
     {
 
         public string Title => "Operating System";

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Management;
-using TheV.Models;
+using TheV.Lib.Models;
 
-namespace TheV.Helpers
+namespace TheV.Lib.Helpers
 {
     internal static class OsMapper
     {

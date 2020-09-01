@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TheV.Checkers;
-using TheV.Managers;
-using TheV.Models;
+using TheV.Lib.Checkers;
+using TheV.Lib.Managers;
+using TheV.Lib.Models;
 
 namespace TheV.UnitTests.Checkers
 {

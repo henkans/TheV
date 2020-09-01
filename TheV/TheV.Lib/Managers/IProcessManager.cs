@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TheV.Managers
+﻿namespace TheV.Lib.Managers
 {
     public interface IProcessManager
     {

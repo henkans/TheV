@@ -1,9 +1,8 @@
 ﻿using System.Runtime.InteropServices;
-using TheV.Checkers.Interfaces;
 
-namespace TheV.Checkers
+namespace TheV.Lib.Checkers
 {
-    internal class PsVersionChecker //: IVersionChecker
+    public class PsVersionChecker //: IVersionChecker
     {
         public string Title => "Powershell";
 

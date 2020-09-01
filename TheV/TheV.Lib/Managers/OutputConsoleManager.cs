@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using TheV.Checkers.Interfaces;
-using TheV.Models;
+using TheV.Lib.Checkers.Interfaces;
+using TheV.Lib.Models;
 
-namespace TheV.Managers
+namespace TheV.Lib.Managers
 {
 
     //TODO Check out http://colorfulconsole.com/
@@ -25,7 +25,8 @@ namespace TheV.Managers
         {
             if (inputParameters.Verbose)
             {
-                WriteTitle(versionChecker.Title);
+               // WriteTitle(versionChecker.Title);
+                WriteSlimTitle(versionChecker.Title);
                 WriteVersion(versionChecker.GetVersion(inputParameters));
             }
             else
@@ -44,19 +45,114 @@ namespace TheV.Managers
             var stringBuilder = new StringBuilder();
             if (inputParameterse.Verbose)
             {
+
+                var originalForegroundColor = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Cyan;
+
+
                 stringBuilder.AppendLine(@"  _____ _      __   __");
                 stringBuilder.AppendLine(@" |_   _| |_  __\ \ / /");
                 stringBuilder.AppendLine(@"   | | | ' \/ -_) V / ");
                 stringBuilder.AppendLine(@"   |_| |_||_\___|\_/  ");
-                stringBuilder.AppendLine(@" ---------------------");
+                //stringBuilder.AppendLine(@" ---------------------");
+                //stringBuilder.AppendLine("— Rubrik ————————————————————————————————————————————");
+                //stringBuilder.AppendLine("═Rubrik═åäö══════════════");
+               //Console.OutputEncoding = Encoding.GetEncoding(866);
+
+                Console.OutputEncoding = System.Text.Encoding.GetEncoding(1252);
                 Console.WriteLine(stringBuilder.ToString());
+
+                Console.ForegroundColor = originalForegroundColor;
             }
             else
             {
-                WriteLineColored($"TheV (The version) {AssemblyVersion}", ConsoleColor.Black, ConsoleColor.DarkGray);
-                WriteLineColored($"Checked { DateTime.Now }", ConsoleColor.Black, ConsoleColor.DarkGray);
+                var originalForegroundColor = Console.ForegroundColor;
+                var maxLength = Console.WindowWidth;
+                if (maxLength > 60) maxLength = 60;
+                var line2 = new string('—', maxLength);
+                var lineColor = ConsoleColor.Cyan;
+                Console.ForegroundColor = lineColor;
+                Console.WriteLine(line2);
+
+                var titletext = $"TheV (The version) {AssemblyVersion}";
+                Console.Write(new string(' ', maxLength - titletext.Length));
+                Console.WriteLine(titletext);
+
+                Console.ForegroundColor = originalForegroundColor;
+
+                WriteSlimTitle("Test Machine");
+
+                //WriteLineColored($"TheV (The version) {AssemblyVersion}", ConsoleColor.Black, ConsoleColor.DarkGray);
+                //WriteLineColored($"Checked { DateTime.Now }", ConsoleColor.Black, ConsoleColor.DarkGray);
             }
         }
+
+        public void WriteSlimTitle(string title)
+        {
+            var textColor = ConsoleColor.Yellow;
+            var lineColor = ConsoleColor.Cyan;
+
+            var originalForegroundColor = Console.ForegroundColor;
+            var originalBackgroundColor = Console.BackgroundColor;
+
+            // Draw header
+            Console.OutputEncoding = System.Text.Encoding.GetEncoding(1252);
+            //Console.ForegroundColor = lineColor;
+            //Console.Write("—");
+            //Console.ForegroundColor = textColor;
+            //Console.Write($"{title}");
+            //Console.ForegroundColor = lineColor;
+            //Console.WriteLine("————————————————————————————————————————————");
+            //Console.WriteLine($" {title,-(40)}");
+
+            //Console.ForegroundColor = originalForegroundColor;
+            //Console.BackgroundColor = originalBackgroundColor;
+
+
+            var maxLength = Console.WindowWidth;
+            if (maxLength > 60) maxLength = 60;
+            Console.ForegroundColor = lineColor;
+            Console.Write("—");
+            Console.ForegroundColor = textColor;
+            Console.Write($"{title}");
+            var line2 = new string('—', maxLength - (title.Length + 1));
+            Console.ForegroundColor = lineColor;
+            Console.WriteLine(line2);
+
+
+            Console.ForegroundColor = originalForegroundColor;
+            Console.BackgroundColor = originalBackgroundColor;
+
+
+            // Console.Write($" {title,-(40)}"); 
+            // HACK: To set dynamic width
+            //Console.Write("{0, -" + Console.WindowWidth / 2 + "}", $" {title} ");
+            //Console.ForegroundColor = originalForegroundColor;
+            //Console.BackgroundColor = originalBackgroundColor;
+            //Console.WriteLine();
+
+            //var stringBuilder = new StringBuilder();
+            //if (inputParameterse.Verbose)
+            //{
+            //    stringBuilder.AppendLine(@"  _____ _      __   __");
+            //    stringBuilder.AppendLine(@" |_   _| |_  __\ \ / /");
+            //    stringBuilder.AppendLine(@"   | | | ' \/ -_) V / ");
+            //    stringBuilder.AppendLine(@"   |_| |_||_\___|\_/  ");
+            //    //stringBuilder.AppendLine(@" ---------------------");
+            //    stringBuilder.AppendLine("— Rubrik ————————————————————————————————————————————");
+            //    stringBuilder.AppendLine("═Rubrik═åäö══════════════");
+            //    //Console.OutputEncoding = Encoding.GetEncoding(866);
+
+            //    Console.OutputEncoding = System.Text.Encoding.GetEncoding(1252);
+            //    Console.WriteLine(stringBuilder.ToString());
+            //}
+            //else
+            //{
+            //    WriteLineColored($"TheV (The version) {AssemblyVersion}", ConsoleColor.Black, ConsoleColor.DarkGray);
+            //    WriteLineColored($"Checked { DateTime.Now }", ConsoleColor.Black, ConsoleColor.DarkGray);
+            //}
+        }
+
 
         public void WriteFooter(InputParameters inputParameterse)
         {

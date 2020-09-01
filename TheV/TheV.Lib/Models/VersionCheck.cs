@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace TheV.Models
+namespace TheV.Lib.Models
 {
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public class VersionCheck
