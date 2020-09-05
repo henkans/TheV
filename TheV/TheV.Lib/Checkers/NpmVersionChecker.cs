@@ -1,11 +1,17 @@
-﻿using TheV.Lib.Managers;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using TheV.Lib.Checkers.Interfaces;
+using TheV.Lib.Managers;
+using TheV.Lib.Models;
 
 namespace TheV.Lib.Checkers
 {
 
-    public class NpmVersionChecker //: IVersionChecker
+    public class NpmVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
+        private InputParameters _inputParameters;
 
         public NpmVersionChecker(IProcessManager processManager)
         {
@@ -14,10 +20,40 @@ namespace TheV.Lib.Checkers
 
         public string Title => "Npm";
 
-        public string GetVersion(bool verbose = true)
+
+        public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
-            var versionNumber = _processManager.RunCommand("npm", "--version");
-            return $"npm {versionNumber}";
+            _inputParameters = inputParameters;
+
+            //try
+            //{
+                //var versionNumber = _processManager.RunCommand("cmd.exe", "/C npm --version");
+                var versionNumber = _processManager.RunCommand("npm", " --version");
+
+                var versionResults = new Collection<VersionCheck>
+                {
+                    new VersionCheck(Title, versionNumber)
+                };
+
+                return versionResults;
+            //}
+            //catch (ArgumentException e)
+            //{
+            //    //return new Collection<VersionCheck> { new VersionCheck("Warning", e.Message) };
+            //    //Console.WriteLine(e);
+            //    throw;
+            //    //return $"node is not found.";
+            //}
+
+            //throw new System.NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            if (_inputParameters.Debug)
+            {
+                Console.WriteLine($"debug: {GetType().Name} was disposed!");
+            }
         }
     }
 }

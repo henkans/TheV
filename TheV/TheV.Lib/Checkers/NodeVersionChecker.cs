@@ -36,6 +36,7 @@ namespace TheV.Lib.Checkers
             }
             catch (ArgumentException e)
             {
+                //return new Collection<VersionCheck> {new VersionCheck(e.Message, string.Empty)}; 
                 //Console.WriteLine(e);
                 throw;
                 //return $"node is not found.";

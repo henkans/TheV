@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using TheV.Lib.Checkers.Interfaces;
+using TheV.Lib.Helpers;
 using TheV.Lib.Models;
 
 namespace TheV.Lib.Managers
@@ -22,14 +24,20 @@ namespace TheV.Lib.Managers
         // TODO extract to conf
         private const ConsoleColor AppTextColor = ConsoleColor.Cyan;
         private const ConsoleColor TitleColor = ConsoleColor.Yellow;
+        private const ConsoleColor ErrorTextColor = ConsoleColor.Red;
         private const ConsoleColor LineColor = ConsoleColor.Cyan;
         private const ConsoleColor NameColor = ConsoleColor.DarkGray;
         private const ConsoleColor VersionColor = ConsoleColor.White;
 
 
-        private string AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
+        public OutputConsoleManager()
+        {
+            Console.OutputEncoding = Encoding.GetEncoding(1252);
+        }
 
-        public int AppWidth {
+        private static string AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
+
+        private static int AppWidth {
             get
             {
                 var length = Console.WindowWidth;
@@ -41,12 +49,22 @@ namespace TheV.Lib.Managers
         public void WriteVersion(IVersionChecker versionChecker, InputParameters inputParameters)
         {
             // TODO check encoding for Linux
-            Console.OutputEncoding = Encoding.GetEncoding(1252); 
+            
             WriteTitle(versionChecker.Title);
-            WriteVersion(versionChecker.GetVersion(inputParameters), versionChecker.Title);
+
+            try
+            {
+                WriteVersion(versionChecker.GetVersion(inputParameters), versionChecker.Title);
+            }
+            catch (CheckerException e)
+            {
+                Debug.WriteLine(e);
+                WriteError(e.Message);
+                // write base error?
+            }
+            // TODO catch other error?
         }
-
-
+        
         public void WriteHeader(InputParameters inputParameterse)
         {
             var stringBuilder = new StringBuilder();
@@ -118,6 +136,16 @@ namespace TheV.Lib.Managers
                 Console.BackgroundColor = originalBackgroundColor;
             }
         }
+
+
+        private void WriteError(string message)
+        {
+            var originalForegroundColor = Console.ForegroundColor;
+            Console.ForegroundColor = ErrorTextColor;
+            Console.WriteLine(message);
+            Console.ForegroundColor = originalForegroundColor;
+        }
+
 
         public void WriteFooter(InputParameters inputParameterse)
         {

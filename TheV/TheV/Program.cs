@@ -121,7 +121,7 @@ namespace TheV
                 .AddScoped<IVersionChecker, NetCoreSdkVersionChecker>()
                 .AddScoped<IVersionChecker, NetVersionChecker>()
                 .AddScoped<IVersionChecker, NodeVersionChecker>()
-                //.AddScoped<IVersionChecker, NpmVersionChecker>() // Note: Not working. Why? It's in path...
+                .AddScoped<IVersionChecker, NpmVersionChecker>() // Note: Not working. Why? It's in path...
                 //.AddScoped<IVersionChecker, PsVersionChecker>()
 
                 .BuildServiceProvider();
