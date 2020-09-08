@@ -7,7 +7,6 @@ using TheV.Lib.Models;
 
 namespace TheV.Lib.Checkers
 {
-
     public class NodeVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
@@ -25,14 +24,13 @@ namespace TheV.Lib.Checkers
             _inputParameters = inputParameters;
             try
             {
-                var versionNumber = _processManager.RunCommand("node", "--version");
+                var versionNumber = _processManager.RunCommand("node", "--version").Trim();
                 var versionResults = new Collection<VersionCheck>
                 {
                     new VersionCheck(Title, versionNumber)
                 };
 
                 return versionResults;
-                //return $"{versionNumber}";
             }
             catch (ArgumentException e)
             {

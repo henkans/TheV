@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using TheV.Lib.Checkers.Interfaces;
 using TheV.Lib.Models;
 
@@ -14,15 +15,15 @@ namespace TheV.Lib.Checkers
     public class ComputerChecker : IVersionChecker
     {
         private InputParameters _inputParameters;
-        public string Title => "Computer";
+        public string Title => "Machine";
 
         public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
             _inputParameters = inputParameters;
             var versionResults = new Collection<VersionCheck>
             {
-                new VersionCheck("Machine", Environment.MachineName),
-                //new VersionCheck("Ip", LocalIpAddress().ToString()),
+                new VersionCheck("Name", Environment.MachineName),
+                new VersionCheck("Ip", GetLocalIpAddress()),
                 new VersionCheck("Mac", MacAddress())
             };
             return versionResults;
@@ -30,19 +31,28 @@ namespace TheV.Lib.Checkers
 
         private IPAddress LocalIpAddress()
         {
-            if (!NetworkInterface.GetIsNetworkAvailable()) return null;
-            return Dns.GetHostEntry(Dns.GetHostName())
-                .AddressList
-                .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                if (!NetworkInterface.GetIsNetworkAvailable()) return null;  //not working in linux
+                return Dns.GetHostEntry(Dns.GetHostName())
+                    .AddressList
+                    .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+
+            }
+
+            return null;
+
         }
 
         private string MacAddress()
         {
-            return  NetworkInterface
+            var temp =  NetworkInterface
                 .GetAllNetworkInterfaces()
                 .Where(nic => nic.OperationalStatus == OperationalStatus.Up && nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
                 .Select(nic => nic.GetPhysicalAddress().ToString())
                 .FirstOrDefault();
+            return temp;
         }
 
         private static string GetPublicIP()

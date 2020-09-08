@@ -160,6 +160,12 @@ namespace TheV.Lib.Managers
 
                 process.WaitForExit();
             }
+            catch (ArgumentException e)
+            {
+                Debug.WriteLine(e);
+                throw new CheckerException($"Run command error '{fileName} {arguments}'.", e);
+                //throw;
+            }
             catch (Exception e)
             {
                 Debug.WriteLine(e);

@@ -115,7 +115,7 @@ namespace TheV
 
                 //add all version checkers
                 .AddScoped<IVersionChecker, ComputerChecker>()
-                // .AddScoped<IVersionChecker, OsVersionChecker>()
+                .AddScoped<IVersionChecker, OsVersionChecker>()
                 .AddScoped<IVersionChecker, NetCoreRuntimeVersionChecker>()
 
                 .AddScoped<IVersionChecker, NetCoreSdkVersionChecker>()

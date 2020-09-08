@@ -37,7 +37,7 @@ namespace TheV.Lib.Checkers
 
             // If linux return empty
             return versionResults;
-
+           // return new Collection<VersionCheck>();
 
         }
 
@@ -136,10 +136,10 @@ namespace TheV.Lib.Checkers
         }
         public void Dispose()
         {
-            if (_inputParameters.Debug)
-            {
-                Console.WriteLine($"debug: {GetType().Name} was disposed!");
-            }
+            //if (_inputParameters.Debug)
+            //{
+            //    Console.WriteLine($"debug: {GetType().Name} was disposed!");
+            //}
         }
     }
 }

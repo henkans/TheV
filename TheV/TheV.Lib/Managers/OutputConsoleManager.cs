@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using TheV.Lib.Checkers.Interfaces;
-using TheV.Lib.Helpers;
 using TheV.Lib.Models;
 
 namespace TheV.Lib.Managers
 {
-
     //TODO Check out http://colorfulconsole.com/
     public interface IOutputConsoleManager
     {
@@ -29,42 +27,61 @@ namespace TheV.Lib.Managers
         private const ConsoleColor NameColor = ConsoleColor.DarkGray;
         private const ConsoleColor VersionColor = ConsoleColor.White;
 
+        private readonly char _emDash = '—';
 
         public OutputConsoleManager()
         {
             Console.OutputEncoding = Encoding.GetEncoding(1252);
+            // Hack: Set dash on... linux
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) _emDash = '-';
         }
 
-        private static string AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
 
-        private static int AppWidth {
-            get
-            {
-                var length = Console.WindowWidth;
-                if (length > 60) length = 60;
-                return length;
-            }
-        }
-        
         public void WriteVersion(IVersionChecker versionChecker, InputParameters inputParameters)
         {
-            // TODO check encoding for Linux
-            
-            WriteTitle(versionChecker.Title);
-
             try
             {
-                WriteVersion(versionChecker.GetVersion(inputParameters), versionChecker.Title);
+                var checkerResults = versionChecker.GetVersion(inputParameters);
+                if (checkerResults == null || !checkerResults.Any()) return;
+
+                WriteTitle(versionChecker.Title);
+
+                if (Console.IsOutputRedirected)
+                {
+                    foreach (var checkerResult in checkerResults)
+                    {
+                        Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
+                    }
+                    return;
+                }
+
+                var maxlength = checkerResults.Max(c => c.Name.Length);
+                if (maxlength < 20) maxlength = 20;
+
+                foreach (var checkerResult in checkerResults)
+                {
+                    var originalForegroundColor = Console.ForegroundColor;
+                    var originalBackgroundColor = Console.BackgroundColor;
+
+                    Console.ForegroundColor = NameColor;
+                    Console.Write($"{PaddingWithDots((string.IsNullOrWhiteSpace(checkerResult.Name) ? versionChecker.Title : checkerResult.Name), maxlength)}");
+                    Console.ForegroundColor = VersionColor;
+                    Console.WriteLine($"{checkerResult.Version}");
+
+                    Console.ForegroundColor = originalForegroundColor;
+                    Console.BackgroundColor = originalBackgroundColor;
+                }
+
             }
-            catch (CheckerException e)
+            catch (Exception e)
             {
                 Debug.WriteLine(e);
+                WriteTitle(versionChecker.Title);
                 WriteError(e.Message);
-                // write base error?
             }
-            // TODO catch other error?
+
         }
-        
+
         public void WriteHeader(InputParameters inputParameterse)
         {
             var stringBuilder = new StringBuilder();
@@ -83,7 +100,7 @@ namespace TheV.Lib.Managers
             {
                 var originalForegroundColor = Console.ForegroundColor;
                 Console.ForegroundColor = LineColor;
-                Console.WriteLine(new string('—', AppWidth));
+                Console.WriteLine(new string(_emDash, AppWidth));
                 var titletext = $"TheV (The version) {AssemblyVersion}";
                 Console.Write(new string(' ', AppWidth - titletext.Length));
                 Console.WriteLine(titletext);
@@ -91,50 +108,49 @@ namespace TheV.Lib.Managers
             }
         }
 
-        public void WriteTitle(string title)
+        public void WriteFooter(InputParameters inputParameterse)
+        {
+            // TODO: include?
+            //https://github.com/henkans/TheV
+            var originalForegroundColor = Console.ForegroundColor;
+            Console.ForegroundColor = LineColor;
+            Console.WriteLine(new string(_emDash, AppWidth));
+            var footertext = $"Checked { DateTime.Now }";
+            Console.Write(new string(' ', AppWidth - footertext.Length));
+            Console.WriteLine(footertext);
+            Console.ForegroundColor = originalForegroundColor;
+        }
+
+
+
+        private static string AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
+
+        private static int AppWidth
+        {
+            get
+            {
+                var length = Console.WindowWidth;
+                if (length > 60) length = 60;
+                return length;
+            }
+        }
+
+
+
+        private void WriteTitle(string title)
         {
             var originalForegroundColor = Console.ForegroundColor;
             var originalBackgroundColor = Console.BackgroundColor;
-            
+
             Console.ForegroundColor = LineColor;
-            Console.Write("—");
+            Console.Write(_emDash);
             Console.ForegroundColor = TitleColor;
             Console.Write($"{title}");
             Console.ForegroundColor = LineColor;
-            Console.WriteLine(new string('—', AppWidth - (title.Length + 1)));
-            
+            Console.WriteLine(new string(_emDash, AppWidth - (title.Length + 1)));
+
             Console.ForegroundColor = originalForegroundColor;
             Console.BackgroundColor = originalBackgroundColor;
-        }
-
-        
-        private void WriteVersion(IEnumerable<VersionCheck> checkerResults, string title = "")
-        {
-            if (Console.IsOutputRedirected)
-            {
-                foreach (var checkerResult in checkerResults)
-                {
-                    Console.WriteLine($"{checkerResult.Name} {checkerResult.Version}");
-                }
-                return;
-            }
-
-            var maxlength = checkerResults.Max(c => c.Name.Length);
-            if (maxlength < 20) maxlength = 20;
-
-            foreach (var checkerResult in checkerResults)
-            {
-                var originalForegroundColor = Console.ForegroundColor;
-                var originalBackgroundColor = Console.BackgroundColor;
-
-                Console.ForegroundColor = NameColor;
-                Console.Write($"{PaddingWithDots((string.IsNullOrWhiteSpace(checkerResult.Name)? title : checkerResult.Name), maxlength)}");
-                Console.ForegroundColor = VersionColor;
-                Console.WriteLine($"{checkerResult.Version}");
-
-                Console.ForegroundColor = originalForegroundColor;
-                Console.BackgroundColor = originalBackgroundColor;
-            }
         }
 
 
@@ -147,18 +163,7 @@ namespace TheV.Lib.Managers
         }
 
 
-        public void WriteFooter(InputParameters inputParameterse)
-        {
-            // TODO: include?
-            //https://github.com/henkans/TheV
-            var originalForegroundColor = Console.ForegroundColor;
-            Console.ForegroundColor = LineColor;
-            Console.WriteLine(new string('—', AppWidth));
-            var footertext = $"Checked { DateTime.Now }";
-            Console.Write(new string(' ', AppWidth - footertext.Length));
-            Console.WriteLine(footertext);
-            Console.ForegroundColor = originalForegroundColor;
-        }
+
 
         private string PaddingWithDots(string name, int length = 20)
         {
