@@ -9,7 +9,7 @@ using TheV.Lib.Models;
 
 namespace TheV.ConsoleNet4.Configuration
 {
-    public class GenericVersionCheckFactory
+    public class GenericVersionCheckFactory : IGenericVersionCheckFactory
     {
 
         public IList<GenericVersionCheck> Create()

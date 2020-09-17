@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\GenericVersionCheckFactory.cs" />
+    <Compile Include="Configuration\IGenericVersionCheckFactory.cs" />
     <Compile Include="Configuration\TheVConfigurationSection.cs" />
     <Compile Include="Configuration\VersionCheckElement.cs" />
     <Compile Include="Configuration\VersionCheckElementCollection.cs" />
