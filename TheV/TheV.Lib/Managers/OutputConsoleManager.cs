@@ -158,7 +158,7 @@ namespace TheV.Lib.Managers
         {
             var originalForegroundColor = Console.ForegroundColor;
             Console.ForegroundColor = ErrorTextColor;
-            Console.WriteLine(message);
+            Console.WriteLine($" {message}");
             Console.ForegroundColor = originalForegroundColor;
         }
 
@@ -170,7 +170,7 @@ namespace TheV.Lib.Managers
             if (string.IsNullOrWhiteSpace(name)) return new string(' ', length + 2);
             if (name.Length >= length) name = name.Substring(0, length);
             var paddingWithDots = new string('.', length - name.Length);
-            return $"{name}{paddingWithDots}: ";
+            return $" {name}{paddingWithDots}: ";
         }
 
         // Saved for future use...?

@@ -173,5 +173,99 @@ namespace TheV.Lib.Managers
             }
             return output;
         }
+
+
+        public string RunCommandWithRetry(string fileName, string arguments)  // Run synchronous 
+        {
+            string output;
+            var process = new Process();
+
+
+            //
+            // try-catch-retry
+            //
+
+
+            // först vanligt
+            // sen med \c och exe?
+            // sen olika path
+
+            // max tries
+            //for (int i = 0; i < maxTries; i++)
+            //{
+            //    try
+            //    {
+            //        // kör kommando[i]
+            //       // om ok break/return från loop
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        //skip
+            //        Debug.WriteLine(e);
+            //        //throw;
+            //        // Om sista inte gick. kasta vidare felet
+            //    }
+            //}
+
+            try
+            {
+                //Run process
+                process.StartInfo.FileName = fileName;
+                process.StartInfo.Arguments = arguments;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.Start();
+            }
+            catch (Win32Exception e)
+            {
+                Debug.WriteLine(e);
+                //throw new CheckerException($"File not found.", e);
+                //https://docs.microsoft.com/sv-se/windows/win32/seccrypto/common-hresult-values
+                //https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/18d8fbe8-a967-4f1c-ae50-99ca8e491d2d
+                if (e.ErrorCode == ErrorFail && e.NativeErrorCode == NativeErrorFileNotFound)
+                {
+                    // File not found
+                    throw new CheckerException($"{fileName} not found.", e);
+                }
+
+                // This is something else
+                throw new CheckerException(e.Message, e);
+
+            }
+            catch (ObjectDisposedException e)
+            {
+                throw new CheckerException($"Process is disposed.", e);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw new CheckerException($"No file name was specified in the Process component's StartInfo.", e);
+                // OR - The ProcessStartInfo.UseShellExecute member of the StartInfo property is true while ProcessStartInfo.RedirectStandardInput, ProcessStartInfo.RedirectStandardOutput, or ProcessStartInfo.RedirectStandardError is true.
+            }
+
+            try
+            {
+                //Read output (or error)
+                output = process.StandardOutput.ReadToEnd();
+                Debug.WriteLine(output);
+                string err = process.StandardError.ReadToEnd();
+                if (!string.IsNullOrEmpty(err)) throw new ArgumentException($"RunCommand Error {fileName} - args: {arguments} ");
+
+                process.WaitForExit();
+            }
+            catch (ArgumentException e)
+            {
+                Debug.WriteLine(e);
+                throw new CheckerException($"Run command error '{fileName} {arguments}'.", e);
+                //throw;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                throw;
+            }
+            return output;
+        }
+
     }
 }

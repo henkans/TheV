@@ -1,30 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 using TheV.Lib.Checkers.Interfaces;
 using TheV.Lib.Managers;
 using TheV.Lib.Models;
 
 namespace TheV.Lib.Checkers
 {
-    public class NodeVersionChecker : IVersionChecker
+    // Used when check is added in config
+    public class GenericVersionChecker : IVersionChecker
     {
         private readonly IProcessManager _processManager;
+        private readonly GenericVersionCheck _genericVersionCheckConfiguration;
         private InputParameters _inputParameters;
 
-        public NodeVersionChecker(IProcessManager processManager)
+        public GenericVersionChecker(IProcessManager processManager, GenericVersionCheck genericVersionCheckConfiguration)
         {
             _processManager = processManager;
+            _genericVersionCheckConfiguration = genericVersionCheckConfiguration;
         }
 
-        public string Title => "Node";
+        public string Title => _genericVersionCheckConfiguration.Title;
 
         public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
             _inputParameters = inputParameters;
             try
             {
-                var versionNumber = _processManager.RunCommand("node", "--version").Trim().Replace("v","");
+                // TODO: retry
+
+                var versionNumber = _processManager.RunCommand(_genericVersionCheckConfiguration.Filename, _genericVersionCheckConfiguration.Arguments).Trim(); //.Replace("v", "");
                 var versionResults = new Collection<VersionCheck>
                 {
                     new VersionCheck(Title, versionNumber)

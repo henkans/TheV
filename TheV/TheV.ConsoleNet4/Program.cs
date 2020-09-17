@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using CommandLine;
+using Microsoft.Extensions.DependencyInjection;
+using TheV.ConsoleNet4.Configuration;
 using TheV.Lib.Checkers;
 using TheV.Lib.Checkers.Interfaces;
 using TheV.Lib.Managers;
 using TheV.Lib.Models;
 
-namespace TheV.ConsoleApp
+namespace TheV.ConsoleNet4
 {
     class Program
     {
@@ -35,12 +36,12 @@ namespace TheV.ConsoleApp
 
 
             CommandLine.Parser.Default.ParseArguments<Options>(args).MapResult((opts) =>
-                {
-                    _serviceProvider = BuildServiceProvider(new InputParameters(opts.Verbose, opts.Debug));
+            {
+                _serviceProvider = BuildServiceProvider(new InputParameters(opts.Verbose, opts.Debug));
 
-                    
 
-                    return RunVersionCheckers(new InputParameters(opts.Verbose, opts.Debug));
+
+                return RunVersionCheckers(new InputParameters(opts.Verbose, opts.Debug));
                     //return RunOptionsAndReturnExitCode(opts);
 
                 }, //in case parser sucess
@@ -49,7 +50,7 @@ namespace TheV.ConsoleApp
 
 
 
-
+            Console.ReadKey();
 
         }
         static int HandleParseError(IEnumerable<Error> errs)
@@ -100,15 +101,15 @@ namespace TheV.ConsoleApp
         public static ServiceProvider BuildServiceProvider(InputParameters inputParameters)
         {
             //generic checkers
-            var conf = new GenericVersionCheckConfiguration { Title = "Generic Test", Name = "node", Filename = "node", Arguments = " --version" };
+            var temp = new GenericVersionCheckFactory().Create();
 
 
-            return new ServiceCollection()
+           // var conf = new GenericVersionCheck { Title = "Generic Test", Name = "node", Filename = "node", Arguments = " --version" };
+
+            var serviceCollection =   new ServiceCollection()
 
                 .AddSingleton<IProcessManager, ProcessManager>() //Singleton? not if scale up...
                 .AddScoped<IOutputConsoleManager, OutputConsoleManager>()
-
-                .AddScoped<IVersionChecker, GenericVersionChecker>(x => new GenericVersionChecker(x.GetRequiredService<IProcessManager>(), conf))
 
 
 
@@ -121,11 +122,46 @@ namespace TheV.ConsoleApp
                 .AddScoped<IVersionChecker, NetCoreSdkVersionChecker>()
                 .AddScoped<IVersionChecker, NetVersionChecker>()
                 .AddScoped<IVersionChecker, NodeVersionChecker>()
-                .AddScoped<IVersionChecker, NpmVersionChecker>() // Note: Not working. Why? It's in path...
-                .AddScoped<IVersionChecker, PsVersionChecker>()
+                .AddScoped<IVersionChecker, NpmVersionChecker>() 
+                .AddScoped<IVersionChecker, PsVersionChecker>();
 
-                .BuildServiceProvider();
+                // Add generics from config
+                foreach (var genericVersionCheck in temp)
+                {
+                    serviceCollection.AddScoped<IVersionChecker, GenericVersionChecker>(x =>
+                        new GenericVersionChecker(x.GetRequiredService<IProcessManager>(), genericVersionCheck));
+
+                }
+
+
+
+            return serviceCollection.BuildServiceProvider();
+
+
+            //return new ServiceCollection()
+
+            //    .AddSingleton<IProcessManager, ProcessManager>() //Singleton? not if scale up...
+            //    .AddScoped<IOutputConsoleManager, OutputConsoleManager>()
+
+            //    .AddScoped<IVersionChecker, GenericVersionChecker>(x => new GenericVersionChecker(x.GetRequiredService<IProcessManager>(), conf))
+
+
+
+            //    //add all version checkers
+            //    .AddScoped<IVersionChecker, ComputerChecker>()
+            //    .AddScoped<IVersionChecker, OsVersionChecker>()
+            //    .AddScoped<IVersionChecker, VisualStudioVersionChecker>()
+            //    .AddScoped<IVersionChecker, NetCoreRuntimeVersionChecker>()
+
+            //    .AddScoped<IVersionChecker, NetCoreSdkVersionChecker>()
+            //    .AddScoped<IVersionChecker, NetVersionChecker>()
+            //    .AddScoped<IVersionChecker, NodeVersionChecker>()
+            //    .AddScoped<IVersionChecker, NpmVersionChecker>() // Note: Not working. Why? It's in path...
+            //    .AddScoped<IVersionChecker, PsVersionChecker>()
+
+            //    .BuildServiceProvider();
         }
+
 
     }
 }

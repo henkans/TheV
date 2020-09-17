@@ -27,8 +27,9 @@ namespace TheV.Lib.Checkers
 
             //try
             //{
-                //var versionNumber = _processManager.RunCommand("cmd.exe", "/C npm --version");
-                var versionNumber = _processManager.RunCommand("npm", " --version");
+            //TODO. do retry with cmd.exe /C
+                var versionNumber = _processManager.RunCommand("cmd.exe", "/C npm --version").Trim();
+                //var versionNumber = _processManager.RunCommand("npm", " --version");
 
                 var versionResults = new Collection<VersionCheck>
                 {

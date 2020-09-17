@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using TheV.Lib.Checkers.Interfaces;
 using TheV.Lib.Models;
 
@@ -20,6 +21,21 @@ namespace TheV.Lib.Checkers
         public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
             _inputParameters = inputParameters;
+            var versionResults = new Collection<VersionCheck>
+            {
+                new VersionCheck("Name", Environment.MachineName),
+                new VersionCheck("Ip", GetLocalIpAddress()),
+                new VersionCheck("Mac", MacAddress())
+            };
+            return versionResults;
+        }
+
+
+        // TODO Do everything async - -Remember!!!!!
+        public async Task<IEnumerable<VersionCheck>> GetVersionAsync(InputParameters inputParameters)
+        {
+            _inputParameters = inputParameters;
+
             var versionResults = new Collection<VersionCheck>
             {
                 new VersionCheck("Name", Environment.MachineName),

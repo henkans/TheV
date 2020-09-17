@@ -1,41 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Runtime.InteropServices;
+using System.Text;
 using TheV.Lib.Checkers.Interfaces;
+using TheV.Lib.Managers;
 using TheV.Lib.Models;
 
 namespace TheV.Lib.Checkers
 {
-    public class PsVersionChecker : IVersionChecker
+    public class VisualStudioVersionChecker : IVersionChecker
     {
+        private readonly IProcessManager _processManager;
         private InputParameters _inputParameters;
-        public string Title => "Powershell";
 
+        public VisualStudioVersionChecker(IProcessManager processManager)
+        {
+            _processManager = processManager;
+        }
+        public string Title => "Visual Studio";
         public IEnumerable<VersionCheck> GetVersion(InputParameters inputParameters)
         {
             _inputParameters = inputParameters;
 
-            var versionResults = new Collection<VersionCheck>();
-
-            //Windows
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            try
             {
-                
-                string regval = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\3", "Install", null).ToString();
-                if (regval.Equals("1"))
+                var productDisplayVersion = _processManager.RunCommand(@"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe", "-latest -property catalog_productDisplayVersion").Trim();
+                var displayName = _processManager.RunCommand(@"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe", "-latest -property displayName").Trim();
+                var versionResults = new Collection<VersionCheck>
                 {
-                    var regval2 = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine", "PowerShellVersion", null).ToString();
-                    versionResults.Add(new VersionCheck(Title, regval2)); 
-                }
+                    new VersionCheck($"{displayName}", productDisplayVersion)
+                };
 
+                return versionResults;
             }
-            return versionResults;
-
+            catch (ArgumentException e)
+            {  //catalog_productDisplayVersion:
+                //catalog_productLineVersion:
+                // "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property
+                //return new Collection<VersionCheck> {new VersionCheck(e.Message, string.Empty)}; 
+                //Console.WriteLine(e);
+                throw;
+                //return $"node is not found.";
+            }
 
 
         }
+
+
 
 
         #region IDisposable Support
@@ -77,6 +88,5 @@ namespace TheV.Lib.Checkers
             // GC.SuppressFinalize(this);
         }
         #endregion 
-
     }
 }
