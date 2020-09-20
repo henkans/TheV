@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TheV.Lib.Checkers;
@@ -9,6 +10,7 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 
 namespace TheV
@@ -18,6 +20,7 @@ namespace TheV
 
         //private static OutputTypes _outputType = OutputTypes.Normal;
         private static ServiceProvider _serviceProvider;
+        public static IConfiguration Configuration { get; set; }
 
         static async Task Main(string[] args)
         {
@@ -33,6 +36,10 @@ namespace TheV
             //Option outputOption = new Option(new string[] { "--output", "-o" }, description: "The target name of the output file.");
             //rootCommand.AddOption(outputOption);
 
+            //Add configuration
+            Configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .Build();
 
 
             //    //// Note that the parameters of the handler method are matched according to the names of the options
@@ -101,7 +108,10 @@ namespace TheV
 
         public static ServiceProvider BuildServiceProvider(InputParameters inputParameters)
         {
-            return new ServiceCollection()
+
+            var genericVersionChecks = Configuration.GetSection("GenericVersionChecks").Get<List<GenericVersionCheck>>();
+
+            var serviceCollection =  new ServiceCollection()
                 .AddLogging(logging =>
                 {
                     //logging.AddConfiguration();
@@ -123,8 +133,15 @@ namespace TheV
                 .AddScoped<IVersionChecker, NodeVersionChecker>()
                 .AddScoped<IVersionChecker, NpmVersionChecker>() // Note: Not working. Why? It's in path...
                 //.AddScoped<IVersionChecker, PsVersionChecker>()
+                ;
+            foreach (var genericVersionCheck in genericVersionChecks)
+            {
+                serviceCollection.AddScoped<IVersionChecker, GenericVersionChecker>(x =>
+                    new GenericVersionChecker(x.GetRequiredService<IProcessManager>(), genericVersionCheck));
 
-                .BuildServiceProvider();
+            }
+
+            return serviceCollection.BuildServiceProvider();
         }
     }
 }
